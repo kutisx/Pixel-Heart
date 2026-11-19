@@ -1,0 +1,323 @@
+/* =========================================================================
+   print.css — печать брендбука на A4 и отдельный режим печати карточки.
+   Решение по цвету: документ брендбука печатается на белом с тёмным текстом
+   и сохранением акцентов палитры; постеры, карточка соцсетей и карточка
+   маскота печатаются в своих цветах (print-color-adjust: exact).
+   ========================================================================= */
+
+@page {
+  size: A4 portrait;
+  margin: 14mm;
+}
+
+@media print {
+  /* ---------------------------------------------------------- база страницы */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #14141c !important;
+    background-image: none !important;
+    min-height: 0;
+  }
+
+  body::before {
+    display: none !important;
+  }
+
+  .site {
+    display: block;
+    min-height: 0;
+  }
+
+  main {
+    display: block;
+  }
+
+  /* ------------------------------------------------- скрыть интерфейс сайта */
+  .site-header,
+  .site-footer,
+  .hero-section,
+  #top,
+  #brief,
+  #color,
+  #typography,
+  #mascot,
+  #layouts,
+  .final-toolbar,
+  .status-toast,
+  .skip-link,
+  .noscript-note,
+  .section__head,
+  dialog,
+  dialog::backdrop,
+  .editor {
+    display: none !important;
+  }
+
+  .section {
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .container {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* ------------------------------------------------------------- брендбук */
+  #final {
+    display: block !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .brandbook {
+    --bb-bg: #ffffff;
+    --bb-text: #14141c;
+    --bb-muted: #54505f;
+    --bb-line: rgba(20, 20, 28, 0.18);
+    display: block !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    color: #14141c !important;
+    font-size: 10pt;
+  }
+
+  .brandbook__doc {
+    gap: 4mm;
+  }
+
+  .brandbook__head {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 4mm;
+    padding-bottom: 3mm;
+    border-bottom: 0.4mm solid rgba(20, 20, 28, 0.24);
+  }
+
+  .brandbook__date {
+    grid-column: auto;
+    text-align: right;
+  }
+
+  .brandbook__mark {
+    width: 11mm;
+    height: 11mm;
+    border-radius: 2mm;
+    border-color: rgba(20, 20, 28, 0.2);
+    background: transparent !important;
+    color: #14141c;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .brandbook__title {
+    font-size: 19pt;
+    line-height: 1.02;
+    color: #14141c;
+    break-after: avoid;
+  }
+
+  .brandbook__slogan {
+    max-width: 150mm;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #2a2733;
+  }
+
+  .brandbook__kicker,
+  .brandbook__date {
+    color: #54505f;
+    font-size: 7pt;
+  }
+
+  .brandbook__grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr 0.95fr;
+    gap: 4mm;
+    align-items: start;
+  }
+
+  .brandbook__grid > .brandbook__block:first-child {
+    grid-column: auto;
+    display: flex;
+    grid-template-columns: none;
+  }
+
+  .brandbook__grid > .brandbook__block:first-child .brandbook__dl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2mm;
+  }
+
+  .brandbook__block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .brandbook__block h4 {
+    color: #54505f;
+    border-bottom-color: rgba(20, 20, 28, 0.18);
+    font-size: 7pt;
+  }
+
+  .brandbook__dl {
+    gap: 2mm;
+  }
+
+  .brandbook__dl dt {
+    color: #54505f;
+    font-size: 6.5pt;
+  }
+
+  .brandbook__dl dd {
+    color: #14141c;
+    font-size: 8pt;
+    line-height: 1.4;
+  }
+
+  .brandbook__swatches {
+    gap: 2mm;
+  }
+
+  .brandbook-swatch__chip {
+    height: 7mm;
+    border-color: rgba(20, 20, 28, 0.18);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .brandbook-swatch__label {
+    color: #54505f;
+    font-size: 6pt;
+  }
+
+  .brandbook-swatch__hex {
+    color: #14141c;
+    font-size: 6.5pt;
+  }
+
+  .brandbook__specimen {
+    font-size: 15pt;
+    color: #14141c;
+    border-color: rgba(20, 20, 28, 0.18);
+  }
+
+  .type-row__label {
+    color: #54505f;
+    font-size: 6pt;
+  }
+
+  .type-row__value {
+    color: #14141c;
+    font-size: 7.5pt;
+  }
+
+  .brandbook__meta,
+  .brandbook__caption,
+  .brandbook__signature,
+  .brandbook__print-note {
+    color: #54505f;
+    font-size: 6.5pt;
+    line-height: 1.45;
+  }
+
+  /* ------------------------------------------------------ макеты на печати */
+  .brandbook__mockups {
+    display: grid;
+    grid-template-columns: 64mm 64mm;
+    gap: 7mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .brandbook__mockups .mockup {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border-color: rgba(20, 20, 28, 0.18) !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .mockup,
+  .mockup * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .brandbook__sign {
+    padding-top: 4mm;
+    border-top-color: rgba(20, 20, 28, 0.18);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  blockquote,
+  dd {
+    widows: 2;
+    orphans: 2;
+  }
+
+  /* ================================================== только карточка маскота */
+
+  body.is-printing-card .site-header,
+  body.is-printing-card .site-footer,
+  body.is-printing-card #brief,
+  body.is-printing-card #color,
+  body.is-printing-card #typography,
+  body.is-printing-card #layouts,
+  body.is-printing-card #final,
+  body.is-printing-card #top,
+  body.is-printing-card .section__head,
+  body.is-printing-card .mascot-scene,
+  body.is-printing-card .mascot-card-wrap > .kicker,
+  body.is-printing-card .mascot-card__actions,
+  body.is-printing-card .mascot-card-wrap > .hint,
+  body.is-printing-card .final-toolbar,
+  body.is-printing-card .status-toast,
+  body.is-printing-card .site-footer,
+  body.is-printing-card #mascot-editor {
+    display: none !important;
+  }
+
+  body.is-printing-card .site,
+  body.is-printing-card main,
+  body.is-printing-card #mascot,
+  body.is-printing-card .mascot-grid,
+  body.is-printing-card .mascot-card-wrap {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+  }
+
+  body.is-printing-card .mascot-card {
+    width: 100% !important;
+    max-width: 150mm;
+    margin: 0 auto !important;
+    padding: 10mm !important;
+    border: 0.4mm solid rgba(20, 20, 28, 0.25) !important;
+    border-radius: 4mm !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.is-printing-card .mascot-card__quote {
+    font-size: 18pt;
+  }
+
+  body.is-printing-card .mascot-card__stage .mascot-svg {
+    width: 60mm;
+  }
+}

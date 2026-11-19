@@ -1,0 +1,277 @@
+/* =========================================================================
+   layouts.css — постер и карточка соцсетей, две композиции, масштабирование
+   типографики через container query units (макет всегда «как в 1080 px»).
+   ========================================================================= */
+
+.composition {
+  margin: 0 0 clamp(1.25rem, 3vw, 2rem);
+}
+
+.choice-grid--composition {
+  max-width: 520px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.layouts-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: start;
+}
+
+.mockup-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.mockup-frame__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--theme-text);
+}
+
+.mockup-frame__caption .mono {
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--theme-muted);
+}
+
+/* --------------------------------------------------------------- макет */
+
+.mockup {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--theme-line);
+  border-radius: calc(var(--radius) * 1.1);
+  background: var(--theme-bg);
+  color: var(--theme-text);
+  box-shadow:
+    0 40px 110px -80px var(--theme-glow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.mockup[data-kind='social'] {
+  aspect-ratio: 1 / 1;
+}
+
+.mockup--poster {
+  --mock-scale: 1.45;
+}
+
+.mockup--social {
+  --mock-scale: 1.02;
+}
+
+.mockup__inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2cqw;
+  padding: 7cqw;
+  background:
+    radial-gradient(80% 60% at 88% 0%, var(--theme-accent-soft), transparent 62%),
+    radial-gradient(70% 50% at 0% 100%, var(--theme-accent-2-soft), transparent 70%);
+}
+
+.mockup__top {
+  display: flex;
+  align-items: center;
+  gap: 1.6cqw;
+  font-family: var(--font-mono);
+  font-size: clamp(8px, 1.5cqw, 13px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--theme-muted);
+}
+
+.mockup__mark {
+  display: grid;
+  place-items: center;
+  width: 7cqw;
+  height: 7cqw;
+  border: 1px solid var(--theme-line);
+  border-radius: 1.4cqw;
+  background: var(--theme-surface);
+  font-family: var(--font-display);
+  font-size: 3.2cqw;
+  letter-spacing: 0;
+  color: var(--theme-accent);
+}
+
+.mockup__brand {
+  color: var(--theme-text);
+}
+
+.mockup__art {
+  display: grid;
+  flex: 1 1 auto;
+  place-items: center;
+  min-height: 0;
+  padding-block: 2cqw;
+  color: var(--theme-accent);
+  opacity: 0.32;
+}
+
+.mockup__art svg {
+  width: min(64%, 30cqw);
+  height: auto;
+  filter: drop-shadow(0 0 4cqw var(--theme-glow));
+}
+
+.mockup__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6cqw;
+  min-width: 0;
+}
+
+.mockup__title {
+  margin: 0;
+  font-family: var(--mock-font, var(--font-display));
+  font-size: calc(var(--mock-size, 48) * 0.0926cqw * var(--mock-scale, 1.45));
+  font-weight: var(--mock-weight, 600);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.mockup__slogan {
+  margin: 0;
+  max-width: 94%;
+  font-family: var(--font-body);
+  font-size: calc(var(--mock-size, 48) * 0.072cqw);
+  font-weight: 400;
+  line-height: 1.32;
+  color: var(--theme-text);
+  opacity: 0.92;
+  overflow-wrap: anywhere;
+}
+
+.mockup__foot {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4cqw;
+  margin-top: auto;
+}
+
+.mockup__rule {
+  width: 100%;
+  height: 1px;
+  background: var(--theme-line);
+}
+
+.mockup__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8cqw 1.2cqw;
+  font-family: var(--font-mono);
+  font-size: clamp(9px, 1.9cqw, 15px);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--theme-muted);
+  overflow-wrap: anywhere;
+}
+
+.mockup__dots {
+  display: inline-flex;
+  gap: 0.8cqw;
+}
+
+.mockup__dot {
+  width: 2.4cqw;
+  height: 2.4cqw;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.mockup--social .mockup__art {
+  place-items: end;
+  padding-block: 0;
+}
+
+.mockup--social .mockup__art svg {
+  width: min(46%, 24cqw);
+  opacity: 0.9;
+}
+
+.mockup--social .mockup__slogan {
+  max-width: 100%;
+}
+
+/* ------------------------------------------------------- композиция offset */
+
+.mockup--offset {
+  --mock-scale: 1.25;
+}
+
+.mockup--offset.mockup--social {
+  --mock-scale: 0.95;
+}
+
+.mockup--offset .mockup__inner {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.mockup--offset .mockup__top {
+  flex-direction: row-reverse;
+  width: 100%;
+}
+
+.mockup--offset .mockup__art {
+  align-self: stretch;
+  place-items: end start;
+  opacity: 0.26;
+}
+
+.mockup--offset .mockup__text {
+  align-items: flex-end;
+  width: 100%;
+}
+
+.mockup--offset .mockup__title {
+  max-width: 88%;
+  margin-top: 2cqw;
+  padding-right: 1.6cqw;
+  border-right: 0.5cqw solid var(--theme-accent);
+}
+
+.mockup--offset .mockup__slogan {
+  max-width: 78%;
+  padding: 1.4cqw 1.8cqw;
+  border: 1px solid var(--theme-line);
+  border-radius: 1cqw;
+  background: rgba(0, 0, 0, 0.18);
+  opacity: 1;
+}
+
+.mockup--offset .mockup__foot {
+  width: 100%;
+  align-items: flex-end;
+}
+
+.mockup--offset .mockup__meta {
+  justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------- адаптивность */
+
+@media (max-width: 780px) {
+  .layouts-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 520px;
+  }
+}

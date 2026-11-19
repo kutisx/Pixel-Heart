@@ -1,0 +1,383 @@
+/* =========================================================================
+   mascot.css — сцена маскота, карточка бренда и модальный редактор.
+   ========================================================================= */
+
+.mascot-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+}
+
+/* ---------------------------------------------------------------- сцена */
+
+.mascot-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  min-height: clamp(420px, 46vw, 560px);
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid var(--theme-line);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(60% 55% at 50% 38%, var(--theme-glow), transparent 72%),
+    radial-gradient(90% 80% at 100% 0%, var(--theme-accent-2-soft), transparent 60%),
+    var(--theme-surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  text-align: center;
+}
+
+.mascot-scene__glow {
+  position: absolute;
+  inline-size: min(420px, 78%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--theme-glow) 0%, transparent 68%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.mascot-scene__stage {
+  position: relative;
+  width: min(280px, 68%);
+  filter: drop-shadow(0 26px 40px rgba(0, 0, 0, 0.45));
+  animation: mascot-float 7s ease-in-out infinite;
+}
+
+.mascot-scene__caption {
+  position: relative;
+  margin: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--theme-muted);
+}
+
+.mascot-scene__novel {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--theme-accent-text);
+}
+
+.mascot-scene__actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.mascot-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+
+@keyframes mascot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* -------------------------------------------------------------- карточка */
+
+.mascot-card-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.mascot-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: 1px solid var(--theme-line);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(80% 60% at 50% 42%, var(--theme-glow), transparent 68%),
+    var(--theme-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--theme-accent-soft),
+    0 34px 90px -60px var(--theme-glow);
+  overflow: hidden;
+}
+
+.mascot-card__top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--theme-accent);
+}
+
+.mascot-card__logo {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--theme-line);
+  border-radius: 9px;
+  background: var(--theme-surface);
+}
+
+.mascot-card__brand {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--theme-text);
+}
+
+.mascot-card__stage {
+  display: grid;
+  place-items: center;
+  padding-block: 0.35rem;
+}
+
+.mascot-card__stage .mascot-svg {
+  width: min(190px, 62%);
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.4));
+}
+
+.mascot-card__quote {
+  position: relative;
+  margin: 0;
+  padding: 0.75rem 0 0.25rem 0.95rem;
+  border-top: 1px solid var(--theme-line);
+  border-left: 2px solid var(--theme-accent);
+  font-family: var(--quote-font, var(--font-display));
+  font-size: clamp(1.05rem, calc(var(--quote-size, 48) * 0.8px), 2rem);
+  font-weight: var(--quote-weight, 600);
+  line-height: 1.25;
+  color: var(--theme-text);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.mascot-card__quote[data-empty='true'] {
+  color: var(--theme-muted);
+  font-style: italic;
+}
+
+.mascot-card__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--theme-muted);
+}
+
+.mascot-card__novel {
+  color: var(--theme-accent-text);
+}
+
+.mascot-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+}
+
+.mascot-card__actions .hint {
+  flex: 1 1 12rem;
+}
+
+/* -------------------------------------------------------------- редактор */
+
+.editor {
+  width: min(720px, calc(100vw - 2rem));
+  max-height: min(88vh, 900px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--theme-line);
+  border-radius: var(--radius-lg);
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  box-shadow: 0 60px 140px -60px #000;
+  overflow: hidden;
+}
+
+.editor::backdrop {
+  background: rgba(5, 4, 8, 0.74);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.editor__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: inherit;
+  padding: clamp(1rem, 3vw, 1.6rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.editor__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.editor__title {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.editor__lead {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.editor__close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--theme-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--theme-text);
+  cursor: pointer;
+}
+
+.editor__close:hover {
+  border-color: var(--theme-accent);
+  background: var(--theme-surface-2);
+}
+
+.editor__close:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.editor__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.editor__preview {
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--theme-line);
+  border-radius: 12px;
+  background: radial-gradient(60% 60% at 50% 45%, var(--theme-glow), transparent 72%), var(--theme-bg);
+}
+
+.editor__preview .mascot-svg {
+  width: min(150px, 52%);
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.4));
+}
+
+.editor__group {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.editor__group .choice-grid {
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+}
+
+.editor__group .choice__face {
+  padding: 0.7rem 0.8rem;
+}
+
+.editor__colors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.editor__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--theme-line);
+}
+
+.editor__foot .btn--quiet {
+  margin-inline-start: auto;
+}
+
+/* ---------------------------------------------------------- адаптивность */
+
+@media (max-width: 900px) {
+  .mascot-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mascot-scene {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 520px) {
+  .mascot-scene__stage {
+    width: min(220px, 62%);
+  }
+
+  .mascot-card__quote {
+    font-size: clamp(1.05rem, calc(var(--quote-size, 48) * 0.6px), 1.75rem);
+  }
+
+  .mascot-scene__actions {
+    flex-direction: column;
+    align-self: stretch;
+  }
+
+  .mascot-scene__actions .btn {
+    width: 100%;
+  }
+
+  .editor__colors {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editor__foot {
+    flex-direction: column;
+  }
+
+  .editor__foot .btn {
+    width: 100%;
+  }
+
+  .editor__foot .btn--quiet {
+    margin-inline-start: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-scene__stage {
+    animation: none;
+  }
+}

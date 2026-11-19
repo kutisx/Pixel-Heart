@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="doki">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pixel Heart — учебный брендбук издательства визуальных новелл</title>
+    <meta
+      name="description"
+      content="Учебный брендбук Pixel Heart: тёмный минимализм, пиксельные акценты, четыре палитры и маскот, которого можно собрать самому."
+    />
+    <meta name="theme-color" content="#1A0F16" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pixel Heart — учебный брендбук" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta
+      property="og:description"
+      content="Тёмный минимализм, пиксельные акценты и четыре истории одного издательства визуальных новелл."
+    />
+
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Pixelify+Sans:wght@400..700&family=Rubik:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/hero.css" />
+    <link rel="stylesheet" href="css/brief.css" />
+    <link rel="stylesheet" href="css/color.css" />
+    <link rel="stylesheet" href="css/typography.css" />
+    <link rel="stylesheet" href="css/mascot.css" />
+    <link rel="stylesheet" href="css/layouts.css" />
+    <link rel="stylesheet" href="css/final.css" />
+    <link rel="stylesheet" href="css/print.css" />
+
+    <script type="module" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main" data-i18n="a11y.skip">Перейти к содержимому</a>
+
+    <div class="site" data-site>
+      <header class="site-header" id="site-header">
+        <div class="site-header__inner container">
+          <a class="brand" href="#top" data-i18n-aria-label="brand.logoAlt">
+            <span class="brand__mark" aria-hidden="true">
+              <svg class="logo" viewBox="0 0 32 32" width="28" height="28" focusable="false">
+                <g fill="currentColor">
+                  <rect x="8" y="6" width="6" height="3" />
+                  <rect x="18" y="6" width="6" height="3" />
+                  <rect x="6" y="9" width="20" height="4" />
+                  <rect x="8" y="13" width="16" height="3" />
+                  <rect x="10" y="16" width="12" height="3" />
+                  <rect x="13" y="19" width="6" height="3" />
+                  <rect x="15" y="22" width="2" height="2" />
+                </g>
+                <rect x="10" y="8" width="3" height="2" fill="#fff" opacity=".55" />
+                <rect x="9" y="17" width="3" height="1" fill="#fff" opacity=".18" />
+              </svg>
+            </span>
+            <span class="brand__text">
+              <span class="brand__name">Pixel Heart</span>
+              <span class="brand__sub" data-i18n="brand.sub">учебный брендбук</span>
+            </span>
+          </a>
+
+          <nav class="site-nav" aria-label="Разделы брендбука" data-i18n-aria-label="nav.aria">
+            <ul class="site-nav__list">
+              <li><a class="site-nav__link" href="#brief" data-i18n="nav.brief">Бриф</a></li>
+              <li><a class="site-nav__link" href="#color" data-i18n="nav.color">Цвет</a></li>
+              <li>
+                <a class="site-nav__link" href="#typography" data-i18n="nav.typography">Типографика</a>
+              </li>
+              <li><a class="site-nav__link" href="#mascot" data-i18n="nav.mascot">Маскот</a></li>
+              <li><a class="site-nav__link" href="#layouts" data-i18n="nav.layouts">Макеты</a></li>
+              <li><a class="site-nav__link" href="#final" data-i18n="nav.final">Итог</a></li>
+            </ul>
+          </nav>
+
+          <div class="site-header__actions">
+            <div class="lang-switch" role="group" aria-label="Язык интерфейса" data-i18n-aria-label="lang.aria">
+              <button class="lang-switch__btn" type="button" data-lang="ru" aria-pressed="true">RU</button>
+              <button class="lang-switch__btn" type="button" data-lang="en" aria-pressed="false">EN</button>
+            </div>
+            <button class="btn btn--primary btn--sm" type="button" id="print-page" aria-label="Печать / PDF" data-i18n-aria-label="actions.print">
+              <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path
+                  d="M4.5 6V2.5h7V6M4 11.5H2.5v-5h11v5H12M4.5 9h7v4.5h-7z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.3"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <span data-i18n="actions.print">Печать / PDF</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main id="main" tabindex="-1">
+        <!-- ============================================================ HERO -->
+        <section class="hero-section" id="top" aria-labelledby="hero-title">
+          <div class="container">
+            <div class="hero-head">
+              <p class="kicker" data-i18n="hero.kicker">Избранное</p>
+              <h1 class="hero-head__title" id="hero-title" data-i18n="hero.headTitle">
+                Издательство визуальных новелл
+              </h1>
+              <p class="hero-head__lead" data-i18n="hero.headLead">
+                Тёмный минимализм, пиксельные акценты и мягкий свет. Четыре истории — одна узнаваемая
+                система.
+              </p>
+            </div>
+
+            <div
+              class="hero"
+              id="hero"
+              role="region"
+              aria-roledescription="carousel"
+              aria-label="Карусель новелл"
+              data-i18n-aria-label="hero.aria"
+              tabindex="0"
+            >
+              <div class="hero__viewport">
+                <div class="hero__track" id="hero-track"></div>
+              </div>
+
+              <button class="hero__nav hero__nav--prev" type="button" id="hero-prev" aria-label="Предыдущий слайд" data-i18n-aria-label="hero.prev">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button class="hero__nav hero__nav--next" type="button" id="hero-next" aria-label="Следующий слайд" data-i18n-aria-label="hero.next">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <div class="hero__dots" id="hero-dots"></div>
+            </div>
+
+            <p class="hero__hint" data-i18n="hero.hint">
+              Стрелки ← → листают истории, Home и End прыгают к краям. Наведение или фокус внутри
+              останавливают автопрокрутку.
+            </p>
+            <p class="sr-only" id="hero-live" aria-live="polite" aria-atomic="true"></p>
+          </div>
+        </section>
+
+        <!-- =========================================================== BRIEF -->
+        <section class="section" id="brief" aria-labelledby="brief-title">
+          <div class="container">
+            <header class="section__head">
+              <p class="kicker" data-i18n="brief.kicker">01 · Бриф</p>
+              <h2 class="section__title" id="brief-title" data-i18n="brief.title">Что мы собрали</h2>
+              <p class="section__lead" data-i18n="brief.lead">
+                Бренд-система издательства, которое соединяет пиксельную эстетику, тёмную атмосферу и
+                отомэ-чувственность. Меняйте поля — примеры, макеты и брендбук обновятся сразу.
+              </p>
+            </header>
+
+            <div class="brief-grid">
+              <form class="brief-form" id="brief-form" novalidate>
+                <div class="field">
+                  <label class="field__label" for="brand-name" data-i18n="brief.name">Название</label>
+                  <input
+                    class="input"
+                    id="brand-name"
+                    name="name"
+                    type="text"
+                    autocomplete="off"
+                    required
+                    aria-required="true"
+                    aria-describedby="brand-name-error"
+                    placeholder="Например, Pixel Heart"
+                    data-i18n-placeholder="brief.namePlaceholder"
+                  />
+                  <p class="field__error" id="brand-name-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="brand-slogan" data-i18n="brief.slogan">Слоган</label>
+                  <input
+                    class="input"
+                    id="brand-slogan"
+                    name="slogan"
+                    type="text"
+                    autocomplete="off"
+                    required
+                    aria-required="true"
+                    aria-describedby="brand-slogan-error"
+                    placeholder="Короткая фраза, которая светится"
+                    data-i18n-placeholder="brief.sloganPlaceholder"
+                  />
+                  <p class="field__error" id="brand-slogan-error" role="alert" hidden></p>
+                </div>
+
+                <div class="field field--wide">
+                  <label class="field__label" for="brand-audience" data-i18n="brief.audience">Аудитория</label>
+                  <textarea
+                    class="input"
+                    id="brand-audience"
+                    name="audience"
+                    rows="3"
+                    placeholder="Кому мы говорим"
+                    data-i18n-placeholder="brief.audiencePlaceholder"
+                  ></textarea>
+                </div>
+
+                <div class="field field--wide">
+                  <label class="field__label" for="brand-goal" data-i18n="brief.goal">Цель</label>
+                  <textarea
+                    class="input"
+                    id="brand-goal"
+                    name="goal"
+                    rows="3"
+                    placeholder="Что должен сделать бренд"
+                    data-i18n-placeholder="brief.goalPlaceholder"
+                  ></textarea>
+                </div>
+
+                <div class="field field--wide">
+                  <label class="field__label" for="brand-character" data-i18n="brief.character">Характер</label>
+                  <input
+                    class="input"
+                    id="brand-character"
+                    name="character"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Три слова через запятую"
+                    data-i18n-placeholder="brief.characterPlaceholder"
+                  />
+                </div>
+              </form>
+
+              <aside class="brief-memo" aria-labelledby="brief-memo-title">
+                <p class="kicker" id="brief-memo-title" data-i18n="brief.memoTitle">
+                  Так это выглядит на носителе
+                </p>
+                <div class="memo" id="brief-memo"></div>
+                <p class="hint" data-i18n="brief.memoNote">
+                  Живой пример: обновляется на каждом нажатии клавиши.
+                </p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================== COLOR -->
+        <section class="section" id="color" aria-labelledby="color-title">
+          <div class="container">
+            <header class="section__head">
+              <p class="kicker" data-i18n="color.kicker">02 · Цвет</p>
+              <h2 class="section__title" id="color-title" data-i18n="color.title">
+                Четыре палитры, один бренд
+              </h2>
+              <p class="section__lead" data-i18n="color.lead">
+                Каждая палитра привязана к новелле и задаёт настроение. Выбор меняет тему всего сайта,
+                образцы и макеты — но не текст, который вы ввели.
+              </p>
+            </header>
+
+            <fieldset class="palette-fieldset">
+              <legend class="sr-only" data-i18n="color.legend">Палитра бренда</legend>
+              <div class="palette-grid" id="palette-grid"></div>
+            </fieldset>
+
+            <div class="palette-preview" id="palette-preview"></div>
+
+            <p class="section__note" data-i18n="color.note">
+              Палитры проверены на читаемость: основной текст и текст на кнопках не ниже 4.5:1.
+            </p>
+          </div>
+        </section>
+
+        <!-- ====================================================== TYPOGRAPHY -->
+        <section class="section" id="typography" aria-labelledby="typography-title">
+          <div class="container">
+            <header class="section__head">
+              <p class="kicker" data-i18n="typography.kicker">03 · Типографика</p>
+              <h2 class="section__title" id="typography-title" data-i18n="typography.title">
+                Свет и буквы
+              </h2>
+              <p class="section__lead" data-i18n="typography.lead">
+                Два шрифта с кириллицей и запасным стеком. Настройте образец и посмотрите, как он живёт
+                в заголовке, абзаце, макетах и карточке.
+              </p>
+            </header>
+
+            <div class="type-grid">
+              <div class="type-controls">
+                <div class="field">
+                  <label class="field__label" for="preview-text" data-i18n="typography.previewText">
+                    Текст примера
+                  </label>
+                  <textarea
+                    class="input"
+                    id="preview-text"
+                    rows="2"
+                    placeholder="Даже в темноте история найдёт свет."
+                    data-i18n-placeholder="typography.previewPlaceholder"
+                  ></textarea>
+                </div>
+
+                <fieldset class="fieldset-plain">
+                  <legend class="field__label" data-i18n="typography.font">Шрифт</legend>
+                  <div class="choice-grid choice-grid--fonts" id="font-choices"></div>
+                </fieldset>
+
+                <div class="field">
+                  <div class="field__row">
+                    <label class="field__label" for="font-size" data-i18n="typography.size">Размер</label>
+                    <output class="mono field__value" id="font-size-value" for="font-size">48 px</output>
+                  </div>
+                  <input
+                    class="range"
+                    id="font-size"
+                    type="range"
+                    min="16"
+                    max="96"
+                    step="1"
+                    value="48"
+                    aria-label="Размер шрифта в пикселях"
+                    data-i18n-aria-label="typography.sizeAria"
+                  />
+                </div>
+
+                <div class="field">
+                  <div class="field__row">
+                    <label class="field__label" for="font-weight" data-i18n="typography.weight">
+                      Насыщенность
+                    </label>
+                    <output class="mono field__value" id="font-weight-value" for="font-weight">600</output>
+                  </div>
+                  <input
+                    class="range"
+                    id="font-weight"
+                    type="range"
+                    min="300"
+                    max="800"
+                    step="100"
+                    value="600"
+                    aria-label="Насыщенность шрифта"
+                    data-i18n-aria-label="typography.weightAria"
+                  />
+                </div>
+
+                <p class="hint" data-i18n="typography.applyNote">
+                  Значения применяются к постеру, карточке соцсетей, цитате маскота и итоговому
+                  брендбуку.
+                </p>
+              </div>
+
+              <div class="type-preview">
+                <p class="type-preview__label mono" data-i18n="typography.heading">Заголовок</p>
+                <p class="type-preview__heading" id="type-heading"></p>
+
+                <p class="type-preview__label mono" data-i18n="typography.body">Абзац</p>
+                <p class="type-preview__body" id="type-body"></p>
+
+                <p class="type-preview__mono mono" data-i18n="typography.monoNote">
+                  Техно-детали набираем IBM Plex Mono: подписи, метрики и служебные пометки.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================== MASCOT -->
+        <section class="section" id="mascot" aria-labelledby="mascot-title">
+          <div class="container">
+            <header class="section__head">
+              <p class="kicker" data-i18n="mascot.kicker">04 · Маскот</p>
+              <h2 class="section__title" id="mascot-title" data-i18n="mascot.title">
+                Пиксельное сердце
+              </h2>
+              <p class="section__lead" data-i18n="mascot.lead">
+                Самостоятельный образ, собранный из слоёв head, body, outfit и accessory. Меняйте
+                одежду, аксессуар и цвета — карточка обновится мгновенно.
+              </p>
+            </header>
+
+            <div class="mascot-grid">
+              <div class="mascot-scene">
+                <div class="mascot-scene__glow" aria-hidden="true"></div>
+                <div class="mascot-scene__stage" data-mascot-slot="scene"></div>
+                <p class="mascot-scene__caption mono" data-i18n="mascot.caption">Маскот бренда</p>
+                <p class="mascot-scene__novel" id="mascot-scene-novel"></p>
+
+                <div class="mascot-scene__actions">
+                  <button class="btn btn--primary" type="button" id="mascot-open" aria-label="Открыть редактор маскота" data-i18n-aria-label="mascot.openAria">
+                    <span data-i18n="mascot.cta">Создайте своего маскота</span>
+                  </button>
+                  <button class="btn btn--ghost" type="button" id="mascot-reset">
+                    <span data-i18n="actions.resetMascot">Сбросить маскота</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mascot-card-wrap">
+                <p class="kicker" data-i18n="mascot.cardCaption">Карточка маскота</p>
+
+                <article class="mascot-card" id="mascot-card">
+                  <div class="mascot-card__top">
+                    <span class="mascot-card__logo" aria-hidden="true">
+                      <svg class="logo" viewBox="0 0 32 32" width="22" height="22" focusable="false">
+                        <g fill="currentColor">
+                          <rect x="8" y="6" width="6" height="3" />
+                          <rect x="18" y="6" width="6" height="3" />
+                          <rect x="6" y="9" width="20" height="4" />
+                          <rect x="8" y="13" width="16" height="3" />
+                          <rect x="10" y="16" width="12" height="3" />
+                          <rect x="13" y="19" width="6" height="3" />
+                          <rect x="15" y="22" width="2" height="2" />
+                        </g>
+                      </svg>
+                    </span>
+                    <span class="mascot-card__brand">Pixel Heart</span>
+                  </div>
+
+                  <div class="mascot-card__stage" data-mascot-slot="card"></div>
+
+                  <blockquote class="mascot-card__quote" id="mascot-card-quote"></blockquote>
+
+                  <div class="mascot-card__foot">
+                    <span class="mascot-card__novel" id="mascot-card-novel"></span>
+                    <span class="mascot-card__mark mono">PIXEL HEART</span>
+                  </div>
+                </article>
+
+                <div class="mascot-card__actions">
+                  <button class="btn btn--primary" type="button" id="print-card">
+                    <span data-i18n="actions.printCard">Печать карточки</span>
+                  </button>
+                  <p class="hint" data-i18n="mascot.cardNote">Печатается отдельно от брендбука</p>
+                </div>
+
+                <p class="hint hint--mono" data-i18n="mascot.layersNote">
+                  Слои маскота: assets/mascot/head.svg, body.svg, outfit-*.svg, accessory-*.svg.
+                </p>
+              </div>
+            </div>
+
+            <dialog class="editor" id="mascot-editor" role="dialog" aria-labelledby="editor-title" aria-modal="true">
+              <div class="editor__inner">
+                <header class="editor__head">
+                  <div>
+                    <p class="kicker" data-i18n="mascot.kicker">04 · Маскот</p>
+                    <h3 class="editor__title" id="editor-title" data-i18n="mascot.editorTitle">
+                      Редактор маскота
+                    </h3>
+                  </div>
+                  <button class="editor__close" type="button" id="mascot-editor-close" aria-label="Закрыть" data-i18n-aria-label="actions.close">
+                    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                      <path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                  </button>
+                </header>
+
+                <p class="editor__lead" data-i18n="mascot.editorLead">
+                  Соберите образ и подпишите его. Цитата печатается выбранным шрифтом и цветами
+                  палитры.
+                </p>
+
+                <div class="editor__preview" aria-hidden="true" data-mascot-slot="editor"></div>
+
+                <fieldset class="editor__group">
+                  <legend class="field__label" id="outfit-legend" data-i18n="mascot.outfit">Одежда</legend>
+                  <div class="choice-grid" id="outfit-choices" role="radiogroup" aria-labelledby="outfit-legend"></div>
+                </fieldset>
+
+                <fieldset class="editor__group">
+                  <legend class="field__label" id="accessory-legend" data-i18n="mascot.accessory">
+                    Аксессуар
+                  </legend>
+                  <div class="choice-grid" id="accessory-choices" role="radiogroup" aria-labelledby="accessory-legend"></div>
+                </fieldset>
+
+                <div class="editor__colors">
+                  <div class="field field--color">
+                    <label class="field__label" for="mascot-head-color" data-i18n="mascot.headColor">
+                      Цвет головы
+                    </label>
+                    <input class="color-input" id="mascot-head-color" type="color" value="#FFD1E6" />
+                  </div>
+                  <div class="field field--color">
+                    <label class="field__label" for="mascot-body-color" data-i18n="mascot.bodyColor">
+                      Цвет тела
+                    </label>
+                    <input class="color-input" id="mascot-body-color" type="color" value="#2A1A2E" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="mascot-quote" data-i18n="mascot.quote">
+                    Цитата на карточке
+                  </label>
+                  <textarea
+                    class="input"
+                    id="mascot-quote"
+                    rows="2"
+                    placeholder="Короткая фраза для карточки"
+                    data-i18n-placeholder="mascot.quotePlaceholder"
+                  ></textarea>
+                </div>
+
+                <footer class="editor__foot">
+                  <button class="btn btn--primary" type="button" id="editor-print-card">
+                    <span data-i18n="actions.printCard">Печать карточки</span>
+                  </button>
+                  <button class="btn btn--ghost" type="button" id="editor-reset">
+                    <span data-i18n="actions.resetMascot">Сбросить маскота</span>
+                  </button>
+                  <button class="btn btn--quiet" type="button" id="editor-done">
+                    <span data-i18n="actions.close">Закрыть</span>
+                  </button>
+                </footer>
+              </div>
+            </dialog>
+          </div>
+        </section>
+
+        <!-- ========================================================= LAYOUTS -->
+        <section class="section" id="layouts" aria-labelledby="layouts-title">
+          <div class="container">
+            <header class="section__head">
+              <p class="kicker" data-i18n="layouts.kicker">05 · Макеты</p>
+              <h2 class="section__title" id="layouts-title" data-i18n="layouts.title">
+                Один бренд, два носителя
+              </h2>
+              <p class="section__lead" data-i18n="layouts.lead">
+                Вертикальный постер и квадратная карточка для соцсетей. Композиция переключается сразу
+                на обоих макетах и в итоговом брендбуке.
+              </p>
+            </header>
+
+            <fieldset class="composition">
+              <legend class="field__label" data-i18n="layouts.composition">Композиция</legend>
+              <div class="choice-grid choice-grid--composition" id="composition-choices"></div>
+            </fieldset>
+
+            <div class="layouts-grid">
+              <figure class="mockup-frame">
+                <div class="mockup" id="mockup-poster" data-kind="poster"></div>
+                <figcaption class="mockup-frame__caption">
+                  <span data-i18n="layouts.poster">Постер</span>
+                  <span class="mono" data-i18n="layouts.posterMeta">1080 × 1350 · вертикаль</span>
+                </figcaption>
+              </figure>
+
+              <figure class="mockup-frame">
+                <div class="mockup" id="mockup-social" data-kind="social"></div>
+                <figcaption class="mockup-frame__caption">
+                  <span data-i18n="layouts.social">Карточка соцсетей</span>
+                  <span class="mono" data-i18n="layouts.socialMeta">1080 × 1080 · квадрат</span>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================== FINAL -->
+        <section class="section" id="final" aria-labelledby="final-title">
+          <div class="container">
+            <header class="section__head">
+              <p class="kicker" data-i18n="final.kicker">06 · Итог</p>
+              <h2 class="section__title" id="final-title" data-i18n="final.title">
+                Брендбук на одну страницу
+              </h2>
+              <p class="section__lead" data-i18n="final.lead">
+                Всё, что вы собрали: бриф, цвета, типографика, макеты и композиция. Печать даёт
+                аккуратный PDF на A4.
+              </p>
+            </header>
+
+            <div class="final-toolbar">
+              <button class="btn btn--primary" type="button" id="print-page-final" aria-label="Печать / PDF" data-i18n-aria-label="actions.print">
+                <svg class="btn__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path
+                    d="M4.5 6V2.5h7V6M4 11.5H2.5v-5h11v5H12M4.5 9h7v4.5h-7z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span data-i18n="actions.print">Печать / PDF</span>
+              </button>
+              <button class="btn btn--ghost" type="button" id="reset-all">
+                <span data-i18n="actions.reset">Сброс</span>
+              </button>
+              <p class="final-toolbar__note" data-i18n="final.storageNote">
+                Настройки сохраняются только в этом браузере и не отправляются на сервер. В другом
+                браузере будет своя версия.
+              </p>
+            </div>
+
+            <div class="brandbook" id="brandbook"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer" id="site-footer">
+        <div class="container site-footer__inner">
+          <div class="site-footer__brand">
+            <span class="brand__mark brand__mark--footer" aria-hidden="true">
+              <svg class="logo" viewBox="0 0 32 32" width="26" height="26" focusable="false">
+                <g fill="currentColor">
+                  <rect x="8" y="6" width="6" height="3" />
+                  <rect x="18" y="6" width="6" height="3" />
+                  <rect x="6" y="9" width="20" height="4" />
+                  <rect x="8" y="13" width="16" height="3" />
+                  <rect x="10" y="16" width="12" height="3" />
+                  <rect x="13" y="19" width="6" height="3" />
+                  <rect x="15" y="22" width="2" height="2" />
+                </g>
+              </svg>
+            </span>
+            <div>
+              <p class="site-footer__name">Pixel Heart</p>
+              <p class="site-footer__sub mono" data-i18n="brand.sub">учебный брендбук</p>
+            </div>
+          </div>
+
+          <p class="site-footer__rights" data-i18n="footer.rights">
+            Doki Doki, Saya no Uta, 9 Rip и VA-11 HALL-A используются как учебная стилизация.
+          </p>
+          <p class="site-footer__storage" data-i18n="footer.storage">
+            Без сервера и аккаунтов: черновик живёт в localStorage этого браузера.
+          </p>
+          <p class="site-footer__made mono" data-i18n="footer.made">
+            HTML, CSS и ванильный JavaScript с ES-модулями.
+          </p>
+
+          <div class="site-footer__actions">
+            <button class="btn btn--quiet btn--sm" type="button" id="reset-footer">
+              <span data-i18n="actions.reset">Сброс</span>
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <div class="status-toast" id="status-toast" role="status" aria-live="polite" hidden>
+      <p class="status-toast__text" id="status-text"></p>
+      <button class="status-toast__close" type="button" id="status-close" aria-label="Скрыть сообщение" data-i18n-aria-label="actions.dismiss">
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <noscript>
+      <p class="noscript-note">
+        Для интерактивного брендбука нужен JavaScript: он собирает макеты и сохраняет черновик локально.
+      </p>
+    </noscript>
+  </body>
+</html>
