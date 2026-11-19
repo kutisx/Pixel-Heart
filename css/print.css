@@ -20,10 +20,6 @@
     min-height: 0;
   }
 
-  body::before {
-    display: none !important;
-  }
-
   .site {
     display: block;
     min-height: 0;
@@ -50,6 +46,11 @@
   .theme-picker,
   .status-toast,
   .skip-link,
+  .sky,
+  .petals,
+  .petal-floor,
+  .petal-walkers,
+  .petal-walker,
   .noscript-note,
   .section__head,
   dialog,

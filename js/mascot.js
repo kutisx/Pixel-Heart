@@ -759,7 +759,12 @@ function bindControls() {
   }
 
   const resetMascot = () => {
-    setState({ mascot: { ...demoState.mascot }, mascotTouched: false });
+    /* образ по умолчанию — вариант новеллы, чья тема сейчас выбрана */
+    const novelId = getPalette(getState().paletteId).novelId;
+    setState({
+      mascot: { ...demoState.mascot, outfitId: novelId, accessoryId: novelId },
+      mascotTouched: false
+    });
   };
 
   ['mascot-reset', 'editor-reset'].forEach((id) => {
@@ -771,6 +776,17 @@ function bindControls() {
     const button = document.getElementById(id);
     if (button) button.addEventListener('click', printCard);
   });
+}
+
+/** Пока маскота не настраивали вручную, он носит вариант выбранной новеллы. */
+function syncMascotWithPalette() {
+  const state = getState();
+  if (state.mascotTouched) return;
+
+  const novelId = getPalette(state.paletteId).novelId;
+  if (state.mascot.outfitId === novelId && state.mascot.accessoryId === novelId) return;
+
+  setState({ mascot: { outfitId: novelId, accessoryId: novelId } });
 }
 
 export function initMascot() {
@@ -789,6 +805,7 @@ export function initMascot() {
 
   if (!dialog || !card || !quoteElement) return;
 
+  syncMascotWithPalette();
   renderChoices();
   renderAll();
   bindControls();

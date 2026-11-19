@@ -18,6 +18,8 @@ import { initMascot } from './mascot.js';
 import { initLayouts } from './layouts.js';
 import { initFinal } from './final.js';
 import { initThemePickers } from './themepicker.js';
+import { initPetals, petalsDebug } from './petals.js';
+import { initSky, skyDebug } from './sky.js';
 
 let toastElement = null;
 let toastText = null;
@@ -176,6 +178,8 @@ function boot() {
   bindReset();
 
   safeInit('hero', initHero);
+  safeInit('petals', initPetals);
+  safeInit('sky', initSky);
   safeInit('brief', initBrief);
   safeInit('color', initColor);
   safeInit('typography', initTypography);
@@ -212,6 +216,8 @@ function boot() {
         setState,
         resetState,
         esc: escapeHtml,
+        petals: petalsDebug,
+        sky: skyDebug,
         version: '1.0.0'
       }),
       configurable: true

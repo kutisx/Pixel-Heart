@@ -64,12 +64,8 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  /* само небо и его свечение живут в css/sky.css */
   background-color: var(--theme-bg);
-  background-image:
-    radial-gradient(90% 55% at 50% -8%, var(--theme-glow), transparent 62%),
-    radial-gradient(60% 40% at 92% 4%, var(--theme-accent-2-soft), transparent 70%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   color: var(--theme-text);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -79,17 +75,6 @@ body {
     background-color 0.6s var(--ease),
     color 0.6s var(--ease);
   overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(38% 30% at 12% 18%, var(--theme-accent-soft), transparent 72%),
-    radial-gradient(30% 26% at 88% 78%, var(--theme-accent-2-soft), transparent 75%);
 }
 
 .site {

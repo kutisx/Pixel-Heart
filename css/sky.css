@@ -1,0 +1,185 @@
+/* =========================================================================
+   sky.css — ночное небо за лепестками.
+   Слой неподвижен: ровный градиент от зенита к горизонту, звёзды и пиксельная
+   луна. Никаких больших свечений и «разводов» — фон остаётся чистым, чтобы не
+   спорить с текстом. Цвета выводятся из токенов палитры (--theme-*), поэтому
+   небо меняется вместе с темой. Лепестки падают поверх него (css/petals.css),
+   контент сайта — ещё выше.
+   ========================================================================= */
+
+.sky {
+  --sky-zenith: color-mix(in srgb, var(--theme-bg) 38%, #04060c);
+  --sky-mid: color-mix(in srgb, var(--theme-bg) 78%, #04060c);
+  --sky-star: color-mix(in srgb, var(--theme-text) 84%, transparent);
+  --sky-star-dim: color-mix(in srgb, var(--theme-text) 34%, transparent);
+  --sky-moon: color-mix(in srgb, var(--theme-accent-2-text) 66%, var(--theme-text) 34%);
+
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--theme-bg);
+  background-image: linear-gradient(
+    180deg,
+    var(--sky-zenith) 0%,
+    var(--sky-mid) 55%,
+    var(--theme-bg) 100%
+  );
+}
+
+/* ---------------------------------------------------------------- звёзды */
+
+.sky__stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 2px at 6% 12%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 14% 6%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 1.5px at 21% 21%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 29% 9%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 1.5px at 36% 26%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 44% 5%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 52% 18%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 2px at 58% 31%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 66% 8%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 72% 24%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 2px at 81% 33%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 88% 10%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 2px at 94% 27%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 9% 38%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 1.5px at 17% 52%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 33% 44%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 1.5px at 47% 57%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 63% 47%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 2px at 77% 56%, var(--sky-star), transparent),
+    radial-gradient(circle 1.5px at 91% 45%, var(--sky-star-dim), transparent);
+  background-repeat: no-repeat;
+}
+
+/* несколько звёзд мерцают: слой живёт поверх спокойного поля */
+.sky__stars::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 2px at 11% 24%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 40% 14%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 55% 38%, var(--sky-star-dim), transparent),
+    radial-gradient(circle 2px at 69% 17%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 85% 41%, var(--sky-star), transparent),
+    radial-gradient(circle 2px at 24% 44%, var(--sky-star-dim), transparent);
+  background-repeat: no-repeat;
+  opacity: 0.35;
+  animation: sky-twinkle 9s ease-in-out infinite alternate;
+}
+
+/* ------------------------------------------------------------------ луна */
+
+.sky__moon {
+  position: absolute;
+  /* запасное положение без JS; во время движения координаты задаёт js/sky.js */
+  top: 14%;
+  left: 72%;
+  width: clamp(46px, 5.2vw, 64px);
+  height: auto;
+  color: var(--sky-moon);
+  filter: drop-shadow(0 0 14px var(--theme-glow));
+}
+
+/* --------------------------------------------------------------- облака */
+
+.sky__cloud {
+  position: absolute;
+  left: 0;
+  color: color-mix(in srgb, var(--theme-text) 55%, var(--theme-accent-text) 8%, transparent);
+  filter: blur(0.7px);
+  pointer-events: none;
+  will-change: transform;
+  animation: sky-cloud-drift 180s linear infinite;
+}
+
+.sky__cloud--far {
+  top: 12%;
+  width: 220px;
+  opacity: 0.6;
+  animation-duration: 230s;
+  animation-delay: -80s;
+}
+
+.sky__cloud--near {
+  top: 22%;
+  width: 300px;
+  opacity: 0.7;
+  animation-duration: 160s;
+  animation-delay: -30s;
+}
+
+.sky__cloud--small {
+  top: 32%;
+  width: 160px;
+  opacity: 0.5;
+  animation-duration: 280s;
+  animation-delay: -150s;
+}
+
+@keyframes sky-cloud-drift {
+  from {
+    transform: translateX(-32vw);
+  }
+  to {
+    transform: translateX(132vw);
+  }
+}
+
+/* -------------------------------------------------------- мерцание звёзд */
+
+@keyframes sky-twinkle {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+/* ------------------------------------------------------ уменьшение движения */
+
+@media (prefers-reduced-motion: reduce) {
+  .sky__stars::after {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .sky__cloud {
+    animation: none;
+  }
+
+  .sky__cloud--far {
+    transform: translateX(14vw);
+  }
+
+  .sky__cloud--near {
+    transform: translateX(48vw);
+  }
+
+  .sky__cloud--small {
+    transform: translateX(74vw);
+  }
+}
+
+/* ---------------------------------------------- узкие экраны: облака мельче */
+
+@media (max-width: 640px) {
+  .sky__cloud--far {
+    width: 140px;
+  }
+
+  .sky__cloud--near {
+    width: 190px;
+  }
+
+  .sky__cloud--small {
+    width: 100px;
+  }
+}

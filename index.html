@@ -29,6 +29,8 @@
     />
 
     <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/sky.css" />
+    <link rel="stylesheet" href="css/petals.css" />
     <link rel="stylesheet" href="css/hero.css" />
     <link rel="stylesheet" href="css/brief.css" />
     <link rel="stylesheet" href="css/color.css" />
@@ -43,6 +45,162 @@
 
   <body>
     <a class="skip-link" href="#main" data-i18n="a11y.skip">Перейти к содержимому</a>
+
+    <!-- Ночное небо за лепестками: декоративный слой, рисует css/sky.css -->
+    <div class="sky" aria-hidden="true">
+      <div class="sky__stars"></div>
+
+      <svg class="sky__moon" id="sky-moon" viewBox="0 0 11 11" width="64" height="64" focusable="false">
+        <g fill="currentColor">
+          <rect x="3" y="0" width="5" height="1" />
+          <rect x="2" y="1" width="7" height="1" />
+          <rect x="1" y="2" width="9" height="2" />
+          <rect x="0" y="4" width="11" height="3" />
+          <rect x="1" y="7" width="9" height="2" />
+          <rect x="2" y="9" width="7" height="1" />
+          <rect x="3" y="10" width="5" height="1" />
+        </g>
+        <g fill="#04060c" opacity=".2">
+          <rect x="2" y="3" width="2" height="2" />
+          <rect x="7" y="5" width="2" height="2" />
+          <rect x="4" y="8" width="1" height="1" />
+        </g>
+      </svg>
+
+      <svg class="sky__cloud sky__cloud--far" viewBox="0 0 36 9" focusable="false">
+        <g fill="currentColor">
+          <rect x="16" y="0" width="2" height="1" />
+          <rect x="14" y="1" width="6" height="1" />
+          <rect x="13" y="2" width="8" height="1" />
+          <rect x="24" y="2" width="5" height="1" />
+          <rect x="5" y="3" width="6" height="1" />
+          <rect x="12" y="3" width="10" height="1" />
+          <rect x="23" y="3" width="7" height="1" />
+          <rect x="5" y="4" width="6" height="1" />
+          <rect x="12" y="4" width="10" height="1" />
+          <rect x="23" y="4" width="7" height="1" />
+          <rect x="4" y="5" width="27" height="1" />
+          <rect x="4" y="6" width="27" height="1" />
+          <rect x="4" y="7" width="27" height="1" />
+          <rect x="4" y="8" width="26" height="1" />
+        </g>
+        <g fill="#ffffff" opacity=".18">
+          <rect x="16" y="0" width="2" height="1" />
+          <rect x="14" y="1" width="2" height="1" />
+          <rect x="18" y="1" width="2" height="1" />
+          <rect x="13" y="2" width="1" height="1" />
+          <rect x="20" y="2" width="1" height="1" />
+          <rect x="24" y="2" width="5" height="1" />
+          <rect x="5" y="3" width="6" height="1" />
+          <rect x="12" y="3" width="1" height="1" />
+          <rect x="21" y="3" width="1" height="1" />
+          <rect x="23" y="3" width="1" height="1" />
+          <rect x="29" y="3" width="1" height="1" />
+          <rect x="4" y="5" width="1" height="1" />
+          <rect x="11" y="5" width="1" height="1" />
+          <rect x="22" y="5" width="1" height="1" />
+          <rect x="30" y="5" width="1" height="1" />
+        </g>
+        <g fill="#04060c" opacity=".22">
+          <rect x="30" y="7" width="1" height="1" />
+          <rect x="4" y="8" width="26" height="1" />
+        </g>
+      </svg>
+
+      <svg class="sky__cloud sky__cloud--near" viewBox="0 0 36 9" focusable="false">
+        <g fill="currentColor">
+          <rect x="16" y="0" width="2" height="1" />
+          <rect x="14" y="1" width="6" height="1" />
+          <rect x="13" y="2" width="8" height="1" />
+          <rect x="24" y="2" width="5" height="1" />
+          <rect x="5" y="3" width="6" height="1" />
+          <rect x="12" y="3" width="10" height="1" />
+          <rect x="23" y="3" width="7" height="1" />
+          <rect x="5" y="4" width="6" height="1" />
+          <rect x="12" y="4" width="10" height="1" />
+          <rect x="23" y="4" width="7" height="1" />
+          <rect x="4" y="5" width="27" height="1" />
+          <rect x="4" y="6" width="27" height="1" />
+          <rect x="4" y="7" width="27" height="1" />
+          <rect x="4" y="8" width="26" height="1" />
+        </g>
+        <g fill="#ffffff" opacity=".18">
+          <rect x="16" y="0" width="2" height="1" />
+          <rect x="14" y="1" width="2" height="1" />
+          <rect x="18" y="1" width="2" height="1" />
+          <rect x="13" y="2" width="1" height="1" />
+          <rect x="20" y="2" width="1" height="1" />
+          <rect x="24" y="2" width="5" height="1" />
+          <rect x="5" y="3" width="6" height="1" />
+          <rect x="12" y="3" width="1" height="1" />
+          <rect x="21" y="3" width="1" height="1" />
+          <rect x="23" y="3" width="1" height="1" />
+          <rect x="29" y="3" width="1" height="1" />
+          <rect x="4" y="5" width="1" height="1" />
+          <rect x="11" y="5" width="1" height="1" />
+          <rect x="22" y="5" width="1" height="1" />
+          <rect x="30" y="5" width="1" height="1" />
+        </g>
+        <g fill="#04060c" opacity=".22">
+          <rect x="30" y="7" width="1" height="1" />
+          <rect x="4" y="8" width="26" height="1" />
+        </g>
+      </svg>
+
+      <svg class="sky__cloud sky__cloud--small" viewBox="0 0 36 9" focusable="false">
+        <g fill="currentColor">
+          <rect x="16" y="0" width="2" height="1" />
+          <rect x="14" y="1" width="6" height="1" />
+          <rect x="13" y="2" width="8" height="1" />
+          <rect x="24" y="2" width="5" height="1" />
+          <rect x="5" y="3" width="6" height="1" />
+          <rect x="12" y="3" width="10" height="1" />
+          <rect x="23" y="3" width="7" height="1" />
+          <rect x="5" y="4" width="6" height="1" />
+          <rect x="12" y="4" width="10" height="1" />
+          <rect x="23" y="4" width="7" height="1" />
+          <rect x="4" y="5" width="27" height="1" />
+          <rect x="4" y="6" width="27" height="1" />
+          <rect x="4" y="7" width="27" height="1" />
+          <rect x="4" y="8" width="26" height="1" />
+        </g>
+        <g fill="#ffffff" opacity=".18">
+          <rect x="16" y="0" width="2" height="1" />
+          <rect x="14" y="1" width="2" height="1" />
+          <rect x="18" y="1" width="2" height="1" />
+          <rect x="13" y="2" width="1" height="1" />
+          <rect x="20" y="2" width="1" height="1" />
+          <rect x="24" y="2" width="5" height="1" />
+          <rect x="5" y="3" width="6" height="1" />
+          <rect x="12" y="3" width="1" height="1" />
+          <rect x="21" y="3" width="1" height="1" />
+          <rect x="23" y="3" width="1" height="1" />
+          <rect x="29" y="3" width="1" height="1" />
+          <rect x="4" y="5" width="1" height="1" />
+          <rect x="11" y="5" width="1" height="1" />
+          <rect x="22" y="5" width="1" height="1" />
+          <rect x="30" y="5" width="1" height="1" />
+        </g>
+        <g fill="#04060c" opacity=".22">
+          <rect x="30" y="7" width="1" height="1" />
+          <rect x="4" y="8" width="26" height="1" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- Сцена с лепестками: декоративный слой под контентом, рисует js/petals.js -->
+    <canvas class="petals" id="petals" aria-hidden="true" role="presentation"></canvas>
+
+    <!-- Нижняя «земля»: сугроб лепестков и линия горизонта поверх контента -->
+    <canvas
+      class="petal-floor"
+      id="petal-floor"
+      aria-hidden="true"
+      role="presentation"
+    ></canvas>
+
+    <!-- Маскоты-дворники: выходят вдоль нижней кромки и убирают лепестки -->
+    <div class="petal-walkers" id="petal-walkers" aria-hidden="true"></div>
 
     <div class="site" data-site>
       <header class="site-header" id="site-header">

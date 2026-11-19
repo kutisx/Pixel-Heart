@@ -464,7 +464,20 @@ export const I18N = {
     'status.quota':
       'Не удалось сохранить черновик: хранилище переполнено. Освободите место в браузере или нажмите «Сброс».',
     'status.reset': 'Демо-данные восстановлены, черновик удалён из этого браузера.',
-    'status.savedAt': 'Сохранено {time}'
+    'status.savedAt': 'Сохранено {time}',
+
+    'scene.talk1a': 'Сэмпай, ты тоже ждёшь новую главу?',
+    'scene.talk1b': 'Жду. И держу для тебя место.',
+    'scene.talk2a': 'Эта история только для нас двоих…',
+    'scene.talk2b': 'Тогда не закрывай вкладку.',
+    'scene.talk3a': 'У тебя сердце как курсор — всё мигает.',
+    'scene.talk3b': 'Это от волнения.',
+    'scene.talk4a': 'После школы — чай и визуальная новелла?',
+    'scene.talk4b': 'Согласна, но маршрут выбираю я.',
+    'scene.talk5a': 'Я сохранилась перед тобой.',
+    'scene.talk5b': 'Лучший сейв за сегодня.',
+    'scene.talk6a': 'Твоя концовка — моя любимая.',
+    'scene.talk6b': 'У нас ещё общий маршрут.'
   },
 
   en: {
@@ -675,6 +688,19 @@ export const I18N = {
     'status.quota':
       'Could not save the draft: storage is full. Free some space in the browser or press “Reset”.',
     'status.reset': 'Demo data restored, the draft was removed from this browser.',
-    'status.savedAt': 'Saved {time}'
+    'status.savedAt': 'Saved {time}',
+
+    'scene.talk1a': 'Senpai, are you waiting for the next chapter too?',
+    'scene.talk1b': 'I am. And saving you a seat.',
+    'scene.talk2a': 'This story is only for the two of us…',
+    'scene.talk2b': 'Then don’t close the tab.',
+    'scene.talk3a': 'Your heart is like a cursor — always blinking.',
+    'scene.talk3b': 'That’s just nerves.',
+    'scene.talk4a': 'Tea and a visual novel after school?',
+    'scene.talk4b': 'Yes — but I pick the route.',
+    'scene.talk5a': 'I saved right before you.',
+    'scene.talk5b': 'Best save of the day.',
+    'scene.talk6a': 'Your ending is my favourite.',
+    'scene.talk6b': 'We still have a shared route.'
   }
 };
