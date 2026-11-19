@@ -160,16 +160,27 @@ const THEME_PROPERTIES = {
 };
 
 /**
- * Применяет палитру к документу: тёмный фон, светлый текст, акценты,
- * свечение и производные поверхности. Возвращает метрики для интерфейса.
+ * Записывает токены палитры в указанный корень. Так можно локально
+ * перекрасить карточку маскота, макет или предпросмотр редактора, не трогая
+ * тему всего сайта. Возвращает собранную тему.
  */
-export function applyTheme(palette, root = document.documentElement) {
+export function applyThemeVars(root, palette) {
   const theme = buildTheme(palette);
 
   Object.keys(THEME_PROPERTIES).forEach((key) => {
     root.style.setProperty(THEME_PROPERTIES[key], theme[key]);
   });
   root.setAttribute('data-theme', theme.paletteId);
+
+  return theme;
+}
+
+/**
+ * Применяет палитру к документу: тёмный фон, светлый текст, акценты,
+ * свечение и производные поверхности. Возвращает метрики для интерфейса.
+ */
+export function applyTheme(palette, root = document.documentElement) {
+  const theme = applyThemeVars(root, palette);
 
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', theme.bg);

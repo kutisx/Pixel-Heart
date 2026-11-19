@@ -564,6 +564,85 @@ async function main() {
   check('14.1', 'EN переводит подписи', english.lang === 'en' && english.nav === 'Brief' && english.heading.includes('What'), JSON.stringify(english));
   check('14.2', 'пользовательский ввод не переводится', english.keep === 'Моё издательство' && english.memo === 'Моё издательство', english.keep);
 
+  /* ------------------------------------------- 16. Мини-темы и фиксация */
+  const themeDefaults = await evaluate(`(() => {
+    const state = window.pixelHeart.getState();
+    return {
+      head: state.mascot.headColor,
+      logo: getComputedStyle(document.querySelector('.brand__mark .logo')).color,
+      pickers: document.querySelectorAll('[data-theme-picker]').length
+    };
+  })()`);
+  check(
+    '16.1',
+    'цвет лица и лого по умолчанию #B92222',
+    themeDefaults.head.toLowerCase() === '#b92222' && themeDefaults.logo === 'rgb(185, 34, 34)',
+    JSON.stringify(themeDefaults)
+  );
+  check('16.2', '5 мини-переключателей темы', themeDefaults.pickers === 5, String(themeDefaults.pickers));
+
+  await evaluate(`document.querySelector('.mockup-theme .theme-picker__btn[data-palette="saya"]').click()`);
+  await sleep(300);
+  const previewTheme = await evaluate(`(() => ({
+    site: window.pixelHeart.getState().paletteId,
+    preview: window.pixelHeart.getState().previewPaletteId,
+    mockupBg: getComputedStyle(document.getElementById('mockup-poster')).getPropertyValue('--theme-bg').trim(),
+    bodyBg: getComputedStyle(document.body).backgroundColor
+  }))()`);
+  check(
+    '16.3',
+    'мини-тема меняет макет, но не сайт',
+    previewTheme.site === 'doki' &&
+      previewTheme.preview === 'saya' &&
+      previewTheme.mockupBg === '#0E1410' &&
+      previewTheme.bodyBg === 'rgb(26, 15, 22)',
+    JSON.stringify(previewTheme)
+  );
+
+  await evaluate(`document.querySelector('[data-theme-picker="commit"] .theme-picker__btn[data-palette="nine"]').click()`);
+  await sleep(400);
+  const fixedTheme = await evaluate(`(() => ({
+    palette: window.pixelHeart.getState().paletteId,
+    locked: window.pixelHeart.getState().paletteLocked,
+    status: document.getElementById('final-theme-status').textContent,
+    pressed: document.querySelector('[data-theme-picker="commit"] .theme-picker__btn[data-palette="nine"]').getAttribute('aria-pressed'),
+    novel: document.querySelector('.brandbook__meta').textContent
+  }))()`);
+  check(
+    '16.4',
+    'кнопка в «Итоге» фиксирует тему PDF',
+    fixedTheme.palette === 'nine' && fixedTheme.locked === true && fixedTheme.pressed === 'true',
+    JSON.stringify(fixedTheme)
+  );
+  check(
+    '16.5',
+    'статус фиксации и новелла совпадают',
+    fixedTheme.status.includes('9 Rip') && fixedTheme.novel.includes('9 Rip'),
+    fixedTheme.status
+  );
+
+  await evaluate(`document.getElementById('hero').focus()`);
+  await key('ArrowRight', 'ArrowRight', 39);
+  await sleep(300);
+  const lockedAfterArrow = await evaluate(`(() => ({
+    novel: window.pixelHeart.getState().activeNovelId,
+    palette: window.pixelHeart.getState().paletteId
+  }))()`);
+  check(
+    '16.6',
+    'зафиксированная тема не зависит от карусели',
+    lockedAfterArrow.palette === 'nine' && lockedAfterArrow.novel !== 'doki',
+    JSON.stringify(lockedAfterArrow)
+  );
+
+  await evaluate(`document.querySelector('[data-theme-picker="commit"] [data-auto]').click()`);
+  await sleep(250);
+  check(
+    '16.7',
+    '«Авто» возвращает тему карусели',
+    await evaluate(`(() => !window.pixelHeart.getState().paletteLocked && window.pixelHeart.getState().previewPaletteId === null)()`)
+  );
+
   /* ---------------------------------------------------- 200% масштаб */
   await setViewport(640, 800);
   await evaluate('document.documentElement.style.zoom = "2"');

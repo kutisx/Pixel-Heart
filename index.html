@@ -435,6 +435,14 @@
                   </div>
                 </article>
 
+                <div class="theme-block theme-block--card" data-theme-panel>
+                  <p class="theme-block__label" data-i18n="theme.mascotLabel">Тема карточки</p>
+                  <div class="theme-picker" data-theme-picker="preview"></div>
+                  <p class="hint" data-i18n="theme.hintPreview">
+                    Меняет только предпросмотр: основной вид сайта и карусель остаются как есть. Финальную тему выбирайте в блоке «Итог».
+                  </p>
+                </div>
+
                 <div class="mascot-card__actions">
                   <button class="btn btn--primary" type="button" id="print-card">
                     <span data-i18n="actions.printCard">Печать карточки</span>
@@ -471,6 +479,11 @@
 
                 <div class="editor__preview" aria-hidden="true" data-mascot-slot="editor"></div>
 
+                <div class="theme-block theme-block--editor">
+                  <p class="theme-block__label" data-i18n="theme.editorLabel">Тема предпросмотра</p>
+                  <div class="theme-picker" data-theme-picker="preview"></div>
+                </div>
+
                 <fieldset class="editor__group">
                   <legend class="field__label" id="outfit-legend" data-i18n="mascot.outfit">Одежда</legend>
                   <div class="choice-grid" id="outfit-choices" role="radiogroup" aria-labelledby="outfit-legend"></div>
@@ -488,7 +501,7 @@
                     <label class="field__label" for="mascot-head-color" data-i18n="mascot.headColor">
                       Цвет головы
                     </label>
-                    <input class="color-input" id="mascot-head-color" type="color" value="#FFD1E6" />
+                    <input class="color-input" id="mascot-head-color" type="color" value="#B92222" />
                   </div>
                   <div class="field field--color">
                     <label class="field__label" for="mascot-body-color" data-i18n="mascot.bodyColor">
@@ -549,6 +562,10 @@
             <div class="layouts-grid">
               <figure class="mockup-frame">
                 <div class="mockup" id="mockup-poster" data-kind="poster"></div>
+                <div class="mockup-theme">
+                  <p class="mockup-theme__label" data-i18n="theme.layoutsLabel">Тема макетов</p>
+                  <div class="theme-picker" data-theme-picker="preview"></div>
+                </div>
                 <figcaption class="mockup-frame__caption">
                   <span data-i18n="layouts.poster">Постер</span>
                   <span class="mono" data-i18n="layouts.posterMeta">1080 × 1350 · вертикаль</span>
@@ -557,6 +574,10 @@
 
               <figure class="mockup-frame">
                 <div class="mockup" id="mockup-social" data-kind="social"></div>
+                <div class="mockup-theme">
+                  <p class="mockup-theme__label" data-i18n="theme.layoutsLabel">Тема макетов</p>
+                  <div class="theme-picker" data-theme-picker="preview"></div>
+                </div>
                 <figcaption class="mockup-frame__caption">
                   <span data-i18n="layouts.social">Карточка соцсетей</span>
                   <span class="mono" data-i18n="layouts.socialMeta">1080 × 1080 · квадрат</span>
@@ -599,6 +620,17 @@
               <p class="final-toolbar__note" data-i18n="final.storageNote">
                 Настройки сохраняются только в этом браузере и не отправляются на сервер. В другом
                 браузере будет своя версия.
+              </p>
+            </div>
+
+            <div class="final-theme" data-theme-panel>
+              <div class="final-theme__head">
+                <p class="final-theme__label" data-i18n="theme.commitLabel">Тема для PDF</p>
+                <p class="final-theme__status" id="final-theme-status" role="status" aria-live="polite"></p>
+              </div>
+              <div class="theme-picker theme-picker--commit" data-theme-picker="commit"></div>
+              <p class="hint" data-i18n="theme.hintCommit">
+                Выбор фиксирует тему для печати: карусель больше не переключает цвета. Нажмите «Авто», чтобы вернуть переключение.
               </p>
             </div>
 

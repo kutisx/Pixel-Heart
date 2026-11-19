@@ -147,7 +147,8 @@ function renderPreview() {
 function handleChange(event) {
   const input = event.target;
   if (!input || input.name !== 'palette') return;
-  setState({ paletteId: input.value });
+  /* Явный выбор в секции «Цвет» меняет и сайт, и тему предпросмотров. */
+  setState({ paletteId: input.value, previewPaletteId: input.value });
 }
 
 export function initColor() {

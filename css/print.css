@@ -44,6 +44,10 @@
   #mascot,
   #layouts,
   .final-toolbar,
+  .final-theme,
+  .theme-block,
+  .mockup-theme,
+  .theme-picker,
   .status-toast,
   .skip-link,
   .noscript-note,
@@ -108,7 +112,7 @@
     border-radius: 2mm;
     border-color: rgba(20, 20, 28, 0.2);
     background: transparent !important;
-    color: #14141c;
+    color: var(--logo-color);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -277,6 +281,7 @@
   body.is-printing-card .section__head,
   body.is-printing-card .mascot-scene,
   body.is-printing-card .mascot-card-wrap > .kicker,
+  body.is-printing-card .theme-block,
   body.is-printing-card .mascot-card__actions,
   body.is-printing-card .mascot-card-wrap > .hint,
   body.is-printing-card .final-toolbar,

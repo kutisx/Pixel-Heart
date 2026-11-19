@@ -1,6 +1,7 @@
 /* =========================================================================
    hero.js — карусель новелл: лента, авто-переключение, клавиатура, точки.
-   Смена слайда синхронизирует activeNovelId и paletteId в state.js.
+   Смена слайда синхронизирует activeNovelId и paletteId в state.js, пока
+   итоговая тема не зафиксирована для печати (paletteLocked).
    ========================================================================= */
 
 import { getState, setState, subscribeTo } from './state.js';
@@ -162,10 +163,14 @@ function applySlide(nextIndex, { animate = true, announce = true } = {}) {
 function syncState(nextIndex) {
   const novel = NOVELS[nextIndex];
   const state = getState();
-  const patch = {
-    activeNovelId: novel.id,
-    paletteId: novel.paletteId
-  };
+  const patch = { activeNovelId: novel.id };
+
+  /* Пока итоговая тема не зафиксирована, карусель ведёт себя как раньше и
+     меняет палитру вместе со слайдом. После фиксации в блоке «Итог» цвета
+     остаются выбранными, а слайды продолжают листаться. */
+  if (!state.paletteLocked) {
+    patch.paletteId = novel.paletteId;
+  }
 
   /* Пользователь уже собрал своего маскота — не затираем его настройки,
      но тему сайта всё равно меняем. */
@@ -181,7 +186,13 @@ function syncState(nextIndex) {
 function chooseTheme(novel) {
   internalUpdate = true;
   const state = getState();
-  const patch = { activeNovelId: novel.id, paletteId: novel.paletteId };
+  /* Это осознанный выбор темы, поэтому он обновляет и предпросмотры.
+     Если тема была зафиксирована для PDF, она остаётся зафиксированной. */
+  const patch = {
+    activeNovelId: novel.id,
+    paletteId: novel.paletteId,
+    previewPaletteId: novel.paletteId
+  };
   if (!state.mascotTouched) {
     patch.mascot = { outfitId: novel.id, accessoryId: novel.id };
   }

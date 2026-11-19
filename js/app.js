@@ -17,6 +17,7 @@ import { initTypography } from './typography.js';
 import { initMascot } from './mascot.js';
 import { initLayouts } from './layouts.js';
 import { initFinal } from './final.js';
+import { initThemePickers } from './themepicker.js';
 
 let toastElement = null;
 let toastText = null;
@@ -181,6 +182,7 @@ function boot() {
   safeInit('mascot', initMascot);
   safeInit('layouts', initLayouts);
   safeInit('final', initFinal);
+  safeInit('themePickers', initThemePickers);
 
   /* Тема и сохранение — после того как модули построили интерфейс. */
   subscribeTo(['paletteId'], (state) => {
