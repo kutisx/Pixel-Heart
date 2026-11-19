@@ -88,6 +88,7 @@ export const PALETTES = [
     id: 'doki',
     novelId: 'doki',
     label: 'Doki Doki',
+    shortLabel: 'Doki',
     mood: { ru: 'Милая тревога, розовый флёр', en: 'Sweet unease, a pink haze' },
     bg: '#1A0F16',
     text: '#F6E9F0',
@@ -99,6 +100,7 @@ export const PALETTES = [
     id: 'saya',
     novelId: 'saya',
     label: 'Saya no Uta',
+    shortLabel: 'Saya',
     mood: { ru: 'Хоррор, плоть и нежность', en: 'Horror, flesh and tenderness' },
     bg: '#0E1410',
     text: '#E6EFE2',
@@ -110,6 +112,7 @@ export const PALETTES = [
     id: 'nine',
     novelId: 'nine',
     label: '9 Rip',
+    shortLabel: '9 Rip',
     mood: { ru: 'Мистика, школа, тайна', en: 'Mystery, school, secrets' },
     bg: '#0A0E1A',
     text: '#E8ECFF',
@@ -121,6 +124,7 @@ export const PALETTES = [
     id: 'va11',
     novelId: 'va11',
     label: 'VA-11 HALL-A',
+    shortLabel: 'VA-11',
     mood: { ru: 'Киберпанк, неон, уют', en: 'Cyberpunk, neon, cosiness' },
     bg: '#120B1E',
     text: '#F5E9FF',
@@ -339,6 +343,24 @@ export const I18N = {
     'color.note':
       'Палитры проверены на читаемость: основной текст и текст на кнопках не ниже 4.5:1. Для кнопок цвет подписи подбирается автоматически — тёмный #0B0B10 или светлый, что даёт лучший контраст.',
 
+    'theme.mascotLabel': 'Тема карточки',
+    'theme.editorLabel': 'Тема предпросмотра',
+    'theme.layoutsLabel': 'Тема макетов',
+    'theme.commitLabel': 'Тема для PDF',
+    'theme.hintPreview':
+      'Меняет только предпросмотр: основной вид сайта и карусель остаются как есть. Финальную тему выбирайте в блоке «Итог».',
+    'theme.hintCommit':
+      'Выбор фиксирует тему для печати: карусель больше не переключает цвета. Нажмите «Авто», чтобы вернуть переключение.',
+    'theme.fixedStatus': 'Тема зафиксирована: {palette}',
+    'theme.autoStatus': 'Авто: тема следует за каруселью',
+    'theme.auto': 'Авто',
+    'theme.autoTitlePreview': 'Следовать теме сайта',
+    'theme.autoTitleCommit': 'Вернуть авто-переключение темы',
+    'theme.choosePreview': 'Показать тему {palette} в предпросмотре',
+    'theme.chooseCommit': 'Зафиксировать тему {palette} для PDF',
+    'theme.pickerAriaPreview': 'Тема предпросмотра',
+    'theme.pickerAriaCommit': 'Тема для PDF',
+
     'typography.kicker': '03 · Типографика',
     'typography.title': 'Свет и буквы',
     'typography.lead':
@@ -442,7 +464,20 @@ export const I18N = {
     'status.quota':
       'Не удалось сохранить черновик: хранилище переполнено. Освободите место в браузере или нажмите «Сброс».',
     'status.reset': 'Демо-данные восстановлены, черновик удалён из этого браузера.',
-    'status.savedAt': 'Сохранено {time}'
+    'status.savedAt': 'Сохранено {time}',
+
+    'scene.talk1a': 'Сэмпай, ты тоже ждёшь новую главу?',
+    'scene.talk1b': 'Жду. И держу для тебя место.',
+    'scene.talk2a': 'Эта история только для нас двоих…',
+    'scene.talk2b': 'Тогда не закрывай вкладку.',
+    'scene.talk3a': 'У тебя сердце как курсор — всё мигает.',
+    'scene.talk3b': 'Это от волнения.',
+    'scene.talk4a': 'После школы — чай и визуальная новелла?',
+    'scene.talk4b': 'Согласна, но маршрут выбираю я.',
+    'scene.talk5a': 'Я сохранилась перед тобой.',
+    'scene.talk5b': 'Лучший сейв за сегодня.',
+    'scene.talk6a': 'Твоя концовка — моя любимая.',
+    'scene.talk6b': 'У нас ещё общий маршрут.'
   },
 
   en: {
@@ -531,6 +566,24 @@ export const I18N = {
     'color.badge': '{ratio}:1',
     'color.note':
       'Palettes are checked for readability: body text and button labels stay at 4.5:1 or higher. Button labels pick dark #0B0B10 or light ink automatically, whichever contrasts better.',
+
+    'theme.mascotLabel': 'Card theme',
+    'theme.editorLabel': 'Preview theme',
+    'theme.layoutsLabel': 'Layout theme',
+    'theme.commitLabel': 'PDF theme',
+    'theme.hintPreview':
+      'Changes this preview only: the main site and carousel stay as they are. Pick the final theme in the Final block.',
+    'theme.hintCommit':
+      'Choosing a theme fixes it for print: the carousel no longer switches colours. Press “Auto” to bring switching back.',
+    'theme.fixedStatus': 'Theme fixed: {palette}',
+    'theme.autoStatus': 'Auto: the theme follows the carousel',
+    'theme.auto': 'Auto',
+    'theme.autoTitlePreview': 'Follow the site theme',
+    'theme.autoTitleCommit': 'Return to auto theme switching',
+    'theme.choosePreview': 'Preview the {palette} theme',
+    'theme.chooseCommit': 'Fix the {palette} theme for PDF',
+    'theme.pickerAriaPreview': 'Preview theme',
+    'theme.pickerAriaCommit': 'PDF theme',
 
     'typography.kicker': '03 · Typography',
     'typography.title': 'Light and letters',
@@ -635,6 +688,19 @@ export const I18N = {
     'status.quota':
       'Could not save the draft: storage is full. Free some space in the browser or press “Reset”.',
     'status.reset': 'Demo data restored, the draft was removed from this browser.',
-    'status.savedAt': 'Saved {time}'
+    'status.savedAt': 'Saved {time}',
+
+    'scene.talk1a': 'Senpai, are you waiting for the next chapter too?',
+    'scene.talk1b': 'I am. And saving you a seat.',
+    'scene.talk2a': 'This story is only for the two of us…',
+    'scene.talk2b': 'Then don’t close the tab.',
+    'scene.talk3a': 'Your heart is like a cursor — always blinking.',
+    'scene.talk3b': 'That’s just nerves.',
+    'scene.talk4a': 'Tea and a visual novel after school?',
+    'scene.talk4b': 'Yes — but I pick the route.',
+    'scene.talk5a': 'I saved right before you.',
+    'scene.talk5b': 'Best save of the day.',
+    'scene.talk6a': 'Your ending is my favourite.',
+    'scene.talk6b': 'We still have a shared route.'
   }
 };

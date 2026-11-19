@@ -16,6 +16,11 @@ import {
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
+/* Старое демо-значение головы маскота: черновики пользователей нужно мягко
+   перевести на новый брендовый цвет, иначе «по умолчанию» останется розовым. */
+const LEGACY_HEAD_COLOR = '#FFD1E6';
+const DEFAULT_HEAD_COLOR = '#B92222';
+
 const LIMITS = {
   name: 120,
   slogan: 200,
@@ -36,6 +41,12 @@ export const demoState = {
   character: 'Тёмный, техно, отомэ',
   activeNovelId: 'doki',
   paletteId: 'doki',
+  /* Тема предпросмотра: если задана, макеты и карточка маскота показывают её,
+     а основной вид сайта продолжает жить на paletteId. */
+  previewPaletteId: null,
+  /* true — финальная тема зафиксирована для PDF: карусель больше не меняет
+     paletteId, пока пользователь сам не выберет другую тему. */
+  paletteLocked: false,
   fontId: 'pixelify',
   fontSize: 48,
   fontWeight: 600,
@@ -44,7 +55,7 @@ export const demoState = {
   quoteText: 'Даже в темноте история найдёт свет.',
   lang: 'ru',
   mascot: {
-    headColor: '#FFD1E6',
+    headColor: DEFAULT_HEAD_COLOR,
     bodyColor: '#2A1A2E',
     outfitId: 'doki',
     accessoryId: 'doki'
@@ -93,6 +104,7 @@ export function normalizeState(raw) {
   if (!isPlainObject(raw)) return base;
 
   const mascot = isPlainObject(raw.mascot) ? raw.mascot : {};
+  const headColor = pickHex(mascot.headColor, base.mascot.headColor);
 
   return {
     name: pickString(raw.name, base.name, LIMITS.name),
@@ -102,6 +114,11 @@ export function normalizeState(raw) {
     character: pickString(raw.character, base.character, LIMITS.character),
     activeNovelId: pickEnum(raw.activeNovelId, NOVEL_IDS, base.activeNovelId),
     paletteId: pickEnum(raw.paletteId, PALETTE_IDS, base.paletteId),
+    previewPaletteId:
+      raw.previewPaletteId == null
+        ? null
+        : pickEnum(raw.previewPaletteId, PALETTE_IDS, null),
+    paletteLocked: Boolean(raw.paletteLocked),
     fontId: pickEnum(raw.fontId, FONT_IDS, base.fontId),
     fontSize: clampNumber(raw.fontSize, LIMITS.fontSize[0], LIMITS.fontSize[1], base.fontSize),
     fontWeight: clampNumber(raw.fontWeight, LIMITS.fontWeight[0], LIMITS.fontWeight[1], base.fontWeight),
@@ -110,7 +127,10 @@ export function normalizeState(raw) {
     quoteText: pickString(raw.quoteText, base.quoteText, LIMITS.quoteText),
     lang: pickEnum(raw.lang, LANG_IDS, base.lang),
     mascot: {
-      headColor: pickHex(mascot.headColor, base.mascot.headColor),
+      headColor:
+        headColor.toUpperCase() === LEGACY_HEAD_COLOR
+          ? base.mascot.headColor
+          : headColor,
       bodyColor: pickHex(mascot.bodyColor, base.mascot.bodyColor),
       outfitId: pickEnum(mascot.outfitId, OUTFIT_IDS, base.mascot.outfitId),
       accessoryId: pickEnum(mascot.accessoryId, ACCESSORY_IDS, base.mascot.accessoryId)
@@ -179,8 +199,13 @@ export function setState(patch = {}) {
       value = clampNumber(value, LIMITS.fontSize[0], LIMITS.fontSize[1], state.fontSize);
     } else if (key === 'fontWeight') {
       value = clampNumber(value, LIMITS.fontWeight[0], LIMITS.fontWeight[1], state.fontWeight);
-    } else if (key === 'mascotTouched') {
+    } else if (key === 'mascotTouched' || key === 'paletteLocked') {
       value = Boolean(value);
+    } else if (key === 'previewPaletteId') {
+      value =
+        value == null || value === ''
+          ? null
+          : pickEnum(value, PALETTE_IDS, state.previewPaletteId || null);
     } else if (typeof state[key] === 'string') {
       value = typeof value === 'string' ? value : state[key];
     }

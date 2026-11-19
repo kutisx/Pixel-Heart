@@ -22,7 +22,7 @@ import {
   getPalette
 } from './data.js';
 import { demoState, getState, setState, subscribeTo } from './state.js';
-import { mix } from './theme.js';
+import { applyThemeVars, mix } from './theme.js';
 import { t, pick } from './i18n.js';
 import { escapeHtml, focusSilently, focusableWithin } from './utils.js';
 
@@ -446,11 +446,15 @@ const ACCESSORY_PARTS = {
 
 /* --------------------------------------------------------------- сборка */
 
-/** Собирает inline SVG маскота. Все части — отдельные группы с data-part. */
-export function buildMascotSVG(state, { decorative = false } = {}) {
+/**
+ * Собирает inline SVG маскота. Все части — отдельные группы с data-part.
+ * paletteId позволяет отрисовать маскота в теме предпросмотра, не меняя
+ * палитру всего сайта.
+ */
+export function buildMascotSVG(state, { decorative = false, paletteId = state.paletteId } = {}) {
   const outfit = getOutfit(state.mascot.outfitId);
   const accessory = getAccessory(state.mascot.accessoryId);
-  const palette = getPalette(state.paletteId || 'doki');
+  const palette = getPalette(paletteId || 'doki');
 
   const headColor = state.mascot.headColor;
   const bodyColor = state.mascot.bodyColor;
@@ -507,9 +511,18 @@ let initialized = false;
 
 function renderSlots() {
   const state = getState();
+  const sitePalette = getPalette(state.paletteId);
+  const previewPalette = getPalette(state.previewPaletteId || state.paletteId);
+
   document.querySelectorAll('[data-mascot-slot]').forEach((slot) => {
     const kind = slot.getAttribute('data-mascot-slot');
-    slot.innerHTML = buildMascotSVG(state, { decorative: kind === 'editor' });
+    /* Сцена живёт в теме сайта, а карточка и редактор — в теме предпросмотра. */
+    const palette = kind === 'scene' ? sitePalette : previewPalette;
+    if (kind !== 'scene') applyThemeVars(slot, palette);
+    slot.innerHTML = buildMascotSVG(state, {
+      decorative: kind === 'editor',
+      paletteId: palette.id
+    });
   });
 }
 
@@ -519,6 +532,7 @@ function renderCard() {
 
   const font = getFont(state.fontId);
   const novel = getNovel(state.activeNovelId);
+  const palette = getPalette(state.previewPaletteId || state.paletteId);
   const quote = state.quoteText.trim();
   const outfit = getOutfit(state.mascot.outfitId);
   const accessory = getAccessory(state.mascot.accessoryId);
@@ -528,6 +542,9 @@ function renderCard() {
   const novelVariant =
     NOVEL_IDS.includes(state.mascot.outfitId) && NOVEL_IDS.includes(state.mascot.accessoryId);
 
+  /* Карточка — самостоятельный носитель: её можно посмотреть в другой теме,
+     не перекрашивая весь сайт. */
+  applyThemeVars(card, palette);
   card.style.setProperty('--quote-font', font.stack);
   card.style.setProperty('--quote-weight', String(state.fontWeight));
   card.style.setProperty('--quote-size', String(state.fontSize));
@@ -742,7 +759,12 @@ function bindControls() {
   }
 
   const resetMascot = () => {
-    setState({ mascot: { ...demoState.mascot }, mascotTouched: false });
+    /* образ по умолчанию — вариант новеллы, чья тема сейчас выбрана */
+    const novelId = getPalette(getState().paletteId).novelId;
+    setState({
+      mascot: { ...demoState.mascot, outfitId: novelId, accessoryId: novelId },
+      mascotTouched: false
+    });
   };
 
   ['mascot-reset', 'editor-reset'].forEach((id) => {
@@ -754,6 +776,17 @@ function bindControls() {
     const button = document.getElementById(id);
     if (button) button.addEventListener('click', printCard);
   });
+}
+
+/** Пока маскота не настраивали вручную, он носит вариант выбранной новеллы. */
+function syncMascotWithPalette() {
+  const state = getState();
+  if (state.mascotTouched) return;
+
+  const novelId = getPalette(state.paletteId).novelId;
+  if (state.mascot.outfitId === novelId && state.mascot.accessoryId === novelId) return;
+
+  setState({ mascot: { outfitId: novelId, accessoryId: novelId } });
 }
 
 export function initMascot() {
@@ -772,13 +805,25 @@ export function initMascot() {
 
   if (!dialog || !card || !quoteElement) return;
 
+  syncMascotWithPalette();
   renderChoices();
   renderAll();
   bindControls();
   bindDialog();
 
   subscribeTo(
-    ['mascot', 'mascotTouched', 'quoteText', 'fontId', 'fontSize', 'fontWeight', 'paletteId', 'activeNovelId', 'lang'],
+    [
+      'mascot',
+      'mascotTouched',
+      'quoteText',
+      'fontId',
+      'fontSize',
+      'fontWeight',
+      'paletteId',
+      'previewPaletteId',
+      'activeNovelId',
+      'lang'
+    ],
     (state, meta) => {
       if (meta.changed.includes('lang')) {
         renderChoices();

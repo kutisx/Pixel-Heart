@@ -1,5 +1,6 @@
 /* =========================================================================
-   color.css — карточки палитр, образцы, бейджи контраста, мини-пример.
+   color.css — карточки палитр, образцы, бейджи контраста, мини-пример
+   и мини-переключатели темы для предпросмотров и фиксации PDF.
    ========================================================================= */
 
 .palette-fieldset {
@@ -295,6 +296,118 @@
   color: var(--theme-muted);
   font-size: 0.75rem;
   line-height: 1.5;
+}
+
+/* ------------------------------------------- мини-переключатель темы */
+
+.theme-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.theme-block__label,
+.mockup-theme__label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--theme-muted);
+}
+
+.theme-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.theme-picker__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--theme-line);
+  border-radius: 9px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--ease),
+    background-color 0.2s var(--ease),
+    box-shadow 0.25s var(--ease),
+    transform 0.15s var(--ease);
+}
+
+.theme-picker__btn:hover {
+  border-color: color-mix(in srgb, var(--theme-accent) 60%, var(--theme-line));
+  background: var(--theme-surface-2);
+}
+
+.theme-picker__btn:active {
+  transform: translateY(1px);
+}
+
+.theme-picker__btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.theme-picker__btn[aria-pressed='true'] {
+  border-color: var(--theme-accent);
+  background: var(--theme-surface-2);
+  box-shadow:
+    inset 0 0 0 1px var(--theme-accent),
+    0 12px 30px -24px var(--theme-glow);
+}
+
+.theme-picker__swatches {
+  display: grid;
+  grid-template-columns: repeat(2, 9px);
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.theme-picker__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: var(--dot);
+}
+
+.theme-picker__name {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  text-align: left;
+}
+
+.theme-picker__auto-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border: 1px dashed var(--theme-accent-text);
+  border-radius: 50%;
+}
+
+.theme-picker--commit .theme-picker__btn {
+  padding-inline: 0.7rem;
+}
+
+.theme-block__label + .theme-picker,
+.mockup-theme__label + .theme-picker {
+  margin-top: 0.05rem;
+}
+
+.theme-block .hint {
+  font-size: 0.6875rem;
 }
 
 /* ---------------------------------------------------------- адаптивность */
