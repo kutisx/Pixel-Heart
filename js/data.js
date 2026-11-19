@@ -176,7 +176,9 @@ export const OUTFITS = [
   { id: 'doki', label: { ru: 'Свитер с сердцем', en: 'Heart sweater' } },
   { id: 'saya', label: { ru: 'Плащ с капюшоном', en: 'Hooded coat' } },
   { id: 'nine', label: { ru: 'Школьная форма', en: 'School uniform' } },
-  { id: 'va11', label: { ru: 'Фартук бармена', en: 'Bartender apron' } }
+  { id: 'va11', label: { ru: 'Фартук бармена', en: 'Bartender apron' } },
+  { id: 'hoodie', label: { ru: 'Худи с карманом', en: 'Pocket hoodie' } },
+  { id: 'dress', label: { ru: 'Платье с рюшами', en: 'Ruffled dress' } }
 ];
 
 export const OUTFIT_IDS = OUTFITS.map((outfit) => outfit.id);
@@ -186,7 +188,9 @@ export const ACCESSORIES = [
   { id: 'doki', label: { ru: 'Лента с сердцем', en: 'Heart ribbon' } },
   { id: 'saya', label: { ru: 'Визор-окуляры', en: 'Visor goggles' } },
   { id: 'nine', label: { ru: 'Звёздная заколка', en: 'Star pin' } },
-  { id: 'va11', label: { ru: 'Гарнитура', en: 'Headset' } }
+  { id: 'va11', label: { ru: 'Наушники', en: 'Headphones' } },
+  { id: 'crown', label: { ru: 'Корона', en: 'Crown' } },
+  { id: 'glasses', label: { ru: 'Круглые очки', en: 'Round glasses' } }
 ];
 
 export const ACCESSORY_IDS = ACCESSORIES.map((accessory) => accessory.id);
@@ -359,10 +363,11 @@ export const I18N = {
     'mascot.kicker': '04 · Маскот',
     'mascot.title': 'Пиксельное сердце',
     'mascot.lead':
-      'Самостоятельный образ, собранный из слоёв head, body, outfit и accessory. Меняйте одежду, аксессуар и цвета — карточка обновится мгновенно.',
+      'Самостоятельный образ, собранный из слоёв head, body, outfit и accessory. Голова — пиксельное сердце, а одежду, аксессуар и цвета можно менять: карточка обновится мгновенно.',
     'mascot.caption': 'Маскот бренда',
     'mascot.cta': 'Создайте своего маскота',
     'mascot.sceneNote': 'Вариант новеллы: {novel}',
+    'mascot.sceneFree': 'Свободный образ: {outfit}, {accessory}',
     'mascot.editorTitle': 'Редактор маскота',
     'mascot.editorLead':
       'Соберите образ и подпишите его. Цитата печатается выбранным шрифтом и цветами палитры.',
@@ -551,10 +556,11 @@ export const I18N = {
     'mascot.kicker': '04 · Mascot',
     'mascot.title': 'A pixel heart',
     'mascot.lead':
-      'An original character built from head, body, outfit and accessory layers. Change clothes, accessory and colours — the card follows instantly.',
+      'An original character built from head, body, outfit and accessory layers. The head is a pixel heart, and clothes, accessory and colours are yours to change — the card follows instantly.',
     'mascot.caption': 'Brand mascot',
     'mascot.cta': 'Create your mascot',
     'mascot.sceneNote': 'Novel variant: {novel}',
+    'mascot.sceneFree': 'Free-form look: {outfit}, {accessory}',
     'mascot.editorTitle': 'Mascot editor',
     'mascot.editorLead':
       'Build the look and give it a line. The quote is set in the chosen font and palette colours.',
