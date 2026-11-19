@@ -1,5 +1,6 @@
 /* =========================================================================
    final.js — итоговый брендбук: бриф, цвета, типографика, макеты, подпись.
+   Здесь же показывается статус зафиксированной для PDF темы.
    Собирается из состояния и обновляется на каждое изменение.
    ========================================================================= */
 
@@ -11,6 +12,7 @@ import { escapeHtml, formatDate } from './utils.js';
 import { createMockup } from './layouts.js';
 
 let container = null;
+let themeStatus = null;
 let initialized = false;
 
 function valueOrEmpty(raw, escape = true) {
@@ -45,6 +47,18 @@ function heartMark() {
     </svg>`;
 }
 
+/** Показывает, зафиксирована ли тема для PDF или следует за каруселью. */
+function renderThemeStatus(state = getState()) {
+  if (!themeStatus) return;
+  const palette = getPalette(state.paletteId);
+  themeStatus.textContent = state.paletteLocked
+    ? t('theme.fixedStatus', { palette: palette.label })
+    : t('theme.autoStatus');
+
+  const panel = themeStatus.closest('[data-theme-panel]');
+  if (panel) panel.setAttribute('data-locked', state.paletteLocked ? 'true' : 'false');
+}
+
 function render() {
   if (!container) return;
 
@@ -52,7 +66,9 @@ function render() {
   const palette = getPalette(state.paletteId);
   const font = getFont(state.fontId);
   const layout = getLayout(state.layoutId);
-  const novel = getNovel(state.activeNovelId);
+  /* Когда тема зафиксирована для PDF, «активная новелла» в документе должна
+     совпадать с зафиксированной палитрой, а не с текущим слайдом карусели. */
+  const novel = getNovel(state.paletteLocked ? palette.novelId : state.activeNovelId);
   const theme = buildTheme(palette);
   const date = formatDate(locale());
 
@@ -142,11 +158,14 @@ function render() {
   if (mockups) {
     mockups.append(createMockup(state, 'poster'), createMockup(state, 'social'));
   }
+
+  renderThemeStatus(state);
 }
 
 export function initFinal() {
   if (initialized) return;
   container = document.getElementById('brandbook');
+  themeStatus = document.getElementById('final-theme-status');
   if (!container) return;
 
   render();
@@ -160,6 +179,7 @@ export function initFinal() {
       'character',
       'activeNovelId',
       'paletteId',
+      'paletteLocked',
       'fontId',
       'fontSize',
       'fontWeight',

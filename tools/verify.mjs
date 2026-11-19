@@ -564,6 +564,85 @@ async function main() {
   check('14.1', 'EN переводит подписи', english.lang === 'en' && english.nav === 'Brief' && english.heading.includes('What'), JSON.stringify(english));
   check('14.2', 'пользовательский ввод не переводится', english.keep === 'Моё издательство' && english.memo === 'Моё издательство', english.keep);
 
+  /* ------------------------------------------- 16. Мини-темы и фиксация */
+  const themeDefaults = await evaluate(`(() => {
+    const state = window.pixelHeart.getState();
+    return {
+      head: state.mascot.headColor,
+      logo: getComputedStyle(document.querySelector('.brand__mark .logo')).color,
+      pickers: document.querySelectorAll('[data-theme-picker]').length
+    };
+  })()`);
+  check(
+    '16.1',
+    'цвет лица и лого по умолчанию #B92222',
+    themeDefaults.head.toLowerCase() === '#b92222' && themeDefaults.logo === 'rgb(185, 34, 34)',
+    JSON.stringify(themeDefaults)
+  );
+  check('16.2', '5 мини-переключателей темы', themeDefaults.pickers === 5, String(themeDefaults.pickers));
+
+  await evaluate(`document.querySelector('.mockup-theme .theme-picker__btn[data-palette="saya"]').click()`);
+  await sleep(300);
+  const previewTheme = await evaluate(`(() => ({
+    site: window.pixelHeart.getState().paletteId,
+    preview: window.pixelHeart.getState().previewPaletteId,
+    mockupBg: getComputedStyle(document.getElementById('mockup-poster')).getPropertyValue('--theme-bg').trim(),
+    bodyBg: getComputedStyle(document.body).backgroundColor
+  }))()`);
+  check(
+    '16.3',
+    'мини-тема меняет макет, но не сайт',
+    previewTheme.site === 'doki' &&
+      previewTheme.preview === 'saya' &&
+      previewTheme.mockupBg === '#0E1410' &&
+      previewTheme.bodyBg === 'rgb(26, 15, 22)',
+    JSON.stringify(previewTheme)
+  );
+
+  await evaluate(`document.querySelector('[data-theme-picker="commit"] .theme-picker__btn[data-palette="nine"]').click()`);
+  await sleep(400);
+  const fixedTheme = await evaluate(`(() => ({
+    palette: window.pixelHeart.getState().paletteId,
+    locked: window.pixelHeart.getState().paletteLocked,
+    status: document.getElementById('final-theme-status').textContent,
+    pressed: document.querySelector('[data-theme-picker="commit"] .theme-picker__btn[data-palette="nine"]').getAttribute('aria-pressed'),
+    novel: document.querySelector('.brandbook__meta').textContent
+  }))()`);
+  check(
+    '16.4',
+    'кнопка в «Итоге» фиксирует тему PDF',
+    fixedTheme.palette === 'nine' && fixedTheme.locked === true && fixedTheme.pressed === 'true',
+    JSON.stringify(fixedTheme)
+  );
+  check(
+    '16.5',
+    'статус фиксации и новелла совпадают',
+    fixedTheme.status.includes('9 Rip') && fixedTheme.novel.includes('9 Rip'),
+    fixedTheme.status
+  );
+
+  await evaluate(`document.getElementById('hero').focus()`);
+  await key('ArrowRight', 'ArrowRight', 39);
+  await sleep(300);
+  const lockedAfterArrow = await evaluate(`(() => ({
+    novel: window.pixelHeart.getState().activeNovelId,
+    palette: window.pixelHeart.getState().paletteId
+  }))()`);
+  check(
+    '16.6',
+    'зафиксированная тема не зависит от карусели',
+    lockedAfterArrow.palette === 'nine' && lockedAfterArrow.novel !== 'doki',
+    JSON.stringify(lockedAfterArrow)
+  );
+
+  await evaluate(`document.querySelector('[data-theme-picker="commit"] [data-auto]').click()`);
+  await sleep(250);
+  check(
+    '16.7',
+    '«Авто» возвращает тему карусели',
+    await evaluate(`(() => !window.pixelHeart.getState().paletteLocked && window.pixelHeart.getState().previewPaletteId === null)()`)
+  );
+
   /* ---------------------------------------------------- 200% масштаб */
   await setViewport(640, 800);
   await evaluate('document.documentElement.style.zoom = "2"');
@@ -584,6 +663,368 @@ async function main() {
   await sleep(300);
   await navigate();
   await shot('shot-final-1280.png');
+
+  /* ------------------------------------------- 17. Фон с лепестками */
+  const petalSnapshot = () =>
+    evaluate(`(() => {
+      const canvas = document.getElementById('petals');
+      if (!canvas) return { missing: true };
+      const context = canvas.getContext('2d');
+      const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+      let painted = 0;
+      let red = 0;
+      let green = 0;
+      let blue = 0;
+      let hash = 0;
+      for (let index = 0; index < data.length; index += 4) {
+        if (!data[index + 3]) continue;
+        painted += 1;
+        red += data[index];
+        green += data[index + 1];
+        blue += data[index + 2];
+        hash = (hash * 31 + index) % 2147483647;
+      }
+      const style = getComputedStyle(canvas);
+      return {
+        painted,
+        hash,
+        palette: canvas.dataset.palette || '',
+        average: painted
+          ? [Math.round(red / painted), Math.round(green / painted), Math.round(blue / painted)]
+          : [],
+        ariaHidden: canvas.getAttribute('aria-hidden'),
+        pointerEvents: style.pointerEvents,
+        position: style.position,
+        zIndex: style.zIndex
+      };
+    })()`);
+
+  const petalsDoki = await petalSnapshot();
+  check(
+    '17.1',
+    'лепестки: декоративный canvas под контентом',
+    !petalsDoki.missing &&
+      petalsDoki.ariaHidden === 'true' &&
+      petalsDoki.pointerEvents === 'none' &&
+      petalsDoki.position === 'fixed' &&
+      petalsDoki.zIndex === '0',
+    JSON.stringify({
+      ariaHidden: petalsDoki.ariaHidden,
+      pointerEvents: petalsDoki.pointerEvents,
+      position: petalsDoki.position,
+      zIndex: petalsDoki.zIndex
+    })
+  );
+  check(
+    '17.2',
+    'лепестки нарисованы в цветах текущей палитры',
+    petalsDoki.painted > 0 && petalsDoki.palette === 'doki' && petalsDoki.average.length === 3,
+    `painted=${petalsDoki.painted} palette=${petalsDoki.palette} avg=${petalsDoki.average.join(',')}`
+  );
+  const layoutBefore = await evaluate(`window.pixelHeart.petals.state().layout`);
+
+  await evaluate(`(() => {
+    const input = document.querySelector('input[name="palette"][value="va11"]');
+    input.checked = true;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await sleep(250);
+  const petalsVa11 = await petalSnapshot();
+  const recoloured =
+    petalsVa11.average.length === 3 &&
+    petalsVa11.average.some((channel, index) => Math.abs(channel - petalsDoki.average[index]) > 8);
+  check(
+    '17.3',
+    'смена темы перекрашивает и меняет лепестки',
+    petalsVa11.painted > 0 && petalsVa11.palette === 'va11' && recoloured,
+    `palette=${petalsVa11.palette} avg=${petalsVa11.average.join(',')}`
+  );
+  const layoutAfter = await evaluate(`window.pixelHeart.petals.state().layout`);
+  check(
+    '17.4',
+    'смена темы не сбрасывает лепестки',
+    layoutBefore !== 0 && layoutAfter === layoutBefore,
+    `layout ${layoutBefore} / ${layoutAfter}`
+  );
+  await shot('shot-petals-va11.png', false);
+
+  const stillA = await petalSnapshot();
+  await sleep(700);
+  const stillB = await petalSnapshot();
+  check(
+    '17.5',
+    'reduced motion: лепестки стоят на месте',
+    stillA.painted > 0 && stillA.hash === stillB.hash && stillA.painted === stillB.painted,
+    `hash ${stillA.hash} / ${stillB.hash}`
+  );
+
+  /* включаем анимацию обратно: проверяем, что кадры действительно меняются.
+     Событие prefers-reduced-motion от CDP доезжает до страницы с задержкой,
+     поэтому ждём выхода из статичного режима, а не фиксированные 500 мс. */
+  await send('Emulation.setEmulatedMedia', { media: '', features: [] });
+  let resumed = null;
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    await sleep(250);
+    resumed = await evaluate(`window.pixelHeart.petals.state().reduced`);
+    if (resumed === false) break;
+  }
+  await sleep(400);
+  const movingA = await petalSnapshot();
+  await sleep(600);
+  const movingB = await petalSnapshot();
+  check(
+    '17.6',
+    'анимация лепестков работает без reduced motion',
+    resumed === false && movingA.painted > 0 && movingA.hash !== movingB.hash,
+    `reduced=${resumed} hash ${movingA.hash} / ${movingB.hash}`
+  );
+
+  const clouds = await evaluate(`(() => {
+    const list = [...document.querySelectorAll('.sky__cloud')];
+    return {
+      count: list.length,
+      animated: list.map((el) => getComputedStyle(el).animationName),
+      positions: list.map((el) => getComputedStyle(el).position),
+      widths: list.map((el) => Math.round(el.getBoundingClientRect().width))
+    };
+  })()`);
+  check(
+    '17.7',
+    'по небу плывут облака',
+    clouds.count >= 2 &&
+      clouds.animated.every((name) => name !== 'none') &&
+      clouds.positions.every((position) => position === 'absolute') &&
+      clouds.widths.every((value) => value > 20),
+    JSON.stringify(clouds)
+  );
+
+  const moonA = await evaluate(`window.pixelHeart.sky.state()`);
+  await sleep(2200);
+  const moonB = await evaluate(`window.pixelHeart.sky.state()`);
+  check(
+    '17.8',
+    'луна идёт по дуге и меняет фазу',
+    moonA.moving === true &&
+      (moonA.x !== moonB.x || moonA.y !== moonB.y) &&
+      moonA.phase !== moonB.phase,
+    JSON.stringify({ moonA, moonB })
+  );
+
+  const sky = await evaluate(`(() => {
+    const el = document.querySelector('.sky');
+    if (!el) return { missing: true };
+    const style = getComputedStyle(el);
+    const canvas = document.getElementById('petals');
+    const rect = el.getBoundingClientRect();
+    return {
+      position: style.position,
+      zIndex: style.zIndex,
+      ariaHidden: el.getAttribute('aria-hidden'),
+      pointerEvents: style.pointerEvents,
+      background: style.backgroundImage,
+      behindPetals: Boolean(el.compareDocumentPosition(canvas) & Node.DOCUMENT_POSITION_FOLLOWING),
+      /* innerWidth/innerHeight включают полосу прокрутки, а fixed-слой с
+         inset: 0 занимает клиентскую область — сравниваем именно с ней. */
+      coversViewport:
+        Math.abs(rect.width - document.documentElement.clientWidth) < 2 &&
+        Math.abs(rect.height - document.documentElement.clientHeight) < 2,
+      stars: Boolean(el.querySelector('.sky__stars')),
+      moon: Boolean(el.querySelector('.sky__moon'))
+    };
+  })()`);
+  check(
+    '17.9',
+    'небо: фиксированный слой за лепестками',
+    !sky.missing &&
+      sky.position === 'fixed' &&
+      sky.zIndex === '0' &&
+      sky.ariaHidden === 'true' &&
+      sky.pointerEvents === 'none' &&
+      sky.background !== 'none' &&
+      sky.behindPetals === true &&
+      sky.coversViewport === true &&
+      sky.stars === true &&
+      sky.moon === true,
+    JSON.stringify({
+      position: sky.position,
+      zIndex: sky.zIndex,
+      behindPetals: sky.behindPetals,
+      stars: sky.stars,
+      moon: sky.moon
+    })
+  );
+
+  const floorLayer = await evaluate(`(() => {
+    const el = document.getElementById('petal-floor');
+    if (!el) return { missing: true };
+    const style = getComputedStyle(el);
+    const rect = el.getBoundingClientRect();
+    const context = el.getContext('2d');
+    const { data } = context.getImageData(0, 0, el.width, el.height);
+    let painted = 0;
+    for (let index = 3; index < data.length; index += 4) if (data[index]) painted += 1;
+    const walkersLayer = document.getElementById('petal-walkers');
+    const site = document.querySelector('.site');
+    return {
+      position: style.position,
+      zIndex: style.zIndex,
+      pointerEvents: style.pointerEvents,
+      bottomOffset: Math.round(window.innerHeight - rect.bottom),
+      width: Math.round(rect.width),
+      painted,
+      walkersZIndex: walkersLayer ? getComputedStyle(walkersLayer).zIndex : null,
+      walkersPosition: walkersLayer ? getComputedStyle(walkersLayer).position : null,
+      siteZIndex: site ? getComputedStyle(site).zIndex : null
+    };
+  })()`);
+  check(
+    '17.10',
+    'земля и маскоты — в фоне под контентом',
+    !floorLayer.missing &&
+      floorLayer.position === 'fixed' &&
+      floorLayer.zIndex === '0' &&
+      floorLayer.pointerEvents === 'none' &&
+      floorLayer.bottomOffset === 0 &&
+      floorLayer.painted > 0 &&
+      floorLayer.walkersZIndex === '0' &&
+      floorLayer.walkersPosition === 'fixed' &&
+      floorLayer.siteZIndex === '1',
+    JSON.stringify(floorLayer)
+  );
+
+  const walkerInfo = await evaluate(`(() => {
+    const list = [...document.querySelectorAll('.petal-walker')];
+    return {
+      count: list.length,
+      items: list.map((el) => ({
+        novel: el.dataset.novel,
+        mode: el.dataset.mode,
+        accessory: el.dataset.accessory,
+        svg: Boolean(el.querySelector('.mascot-svg')),
+        accessoryPart: Boolean(el.querySelector('[data-part="accessory"]')),
+        ariaHidden: el.getAttribute('aria-hidden'),
+        pointerEvents: getComputedStyle(el).pointerEvents,
+        position: getComputedStyle(el).position,
+        broomDisplay: getComputedStyle(el.querySelector('.petal-walker__broom')).display
+      }))
+    };
+  })()`);
+  const walkerNovels = walkerInfo.items.map((item) => item.novel).sort().join(',');
+  const cleanCount = walkerInfo.items.filter((item) => item.mode === 'clean').length;
+  const jumpCount = walkerInfo.items.filter((item) => item.mode === 'jump').length;
+  const broomsOk = walkerInfo.items.every((item) =>
+    item.mode === 'jump' ? item.broomDisplay === 'none' : item.broomDisplay !== 'none'
+  );
+  check(
+    '17.11',
+    'четыре маскота: два дворника и два прыгуна, у каждого свой аксессуар',
+    walkerInfo.count === 4 &&
+      walkerNovels === 'doki,nine,saya,va11' &&
+      cleanCount === 2 &&
+      jumpCount === 2 &&
+      broomsOk &&
+      walkerInfo.items.every(
+        (item) =>
+          item.accessory === item.novel &&
+          item.svg === true &&
+          item.accessoryPart === true &&
+          item.ariaHidden === 'true' &&
+          item.pointerEvents === 'none' &&
+          item.position === 'absolute'
+      ),
+    JSON.stringify({ count: walkerInfo.count, novels: walkerNovels, cleanCount, jumpCount, broomsOk })
+  );
+
+  /* Маскот в примере: сброс и смена темы должны надеть вариант новеллы. */
+  await evaluate(`document.getElementById('mascot-reset').click()`);
+  await sleep(200);
+  await evaluate(`(() => {
+    const input = document.querySelector('input[name="palette"][value="saya"]');
+    input.checked = true;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await sleep(250);
+  const mascotSync = await evaluate(`(() => {
+    const state = window.pixelHeart.getState();
+    return {
+      palette: state.paletteId,
+      outfit: state.mascot.outfitId,
+      accessory: state.mascot.accessoryId,
+      touched: state.mascotTouched
+    };
+  })()`);
+  check(
+    '17.12',
+    'маскот в примере носит аксессуар выбранной новеллы',
+    mascotSync.palette === 'saya' &&
+      mascotSync.outfit === 'saya' &&
+      mascotSync.accessory === 'saya' &&
+      mascotSync.touched === false,
+    JSON.stringify(mascotSync)
+  );
+
+  let restingBefore = 0;
+  for (let attempt = 0; attempt < 24 && restingBefore === 0; attempt += 1) {
+    await sleep(250);
+    restingBefore = await evaluate(`window.pixelHeart.petals.state().resting`);
+  }
+  await evaluate(`window.pixelHeart.petals.walk()`);
+  let scene = { swept: 0, walking: false };
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    await sleep(400);
+    scene = await evaluate(`window.pixelHeart.petals.state()`);
+    if (scene.swept > 0) break;
+  }
+  check(
+    '17.13',
+    'маскоты выходят и убирают лепестки с земли',
+    restingBefore > 0 && scene.swept > 0,
+    JSON.stringify({ restingBefore, ...scene })
+  );
+  await shot('shot-petals-walker.png', false);
+
+  /* верхняя граница подвала становится полом сцены */
+  await evaluate(`window.scrollTo(0, document.body.scrollHeight)`);
+  await sleep(700);
+  const floorState = await evaluate(`(() => {
+    const state = window.pixelHeart.petals.state();
+    return {
+      ...state,
+      viewport: window.innerHeight,
+      natural: window.innerHeight - 9
+    };
+  })()`);
+  check(
+    '17.14',
+    'верхняя граница подвала стала полом сцены',
+    floorState.footerTop !== null &&
+      Math.abs(floorState.floorY - floorState.footerTop) <= 2 &&
+      floorState.floorY < floorState.natural - 40,
+    JSON.stringify({ floorY: floorState.floorY, footerTop: floorState.footerTop })
+  );
+
+  /* маскоты встречаются и обмениваются короткими репликами */
+  await evaluate(`window.pixelHeart.petals.greet()`);
+  await sleep(400);
+  const talk = await evaluate(`(() => ({
+    bubbles: [...document.querySelectorAll('.petal-bubble[data-visible="true"]')].map((el) =>
+      el.textContent.trim()
+    ),
+    meeting: window.pixelHeart.petals.state().meeting
+  }))()`);
+  check(
+    '17.15',
+    'маскоты болтают при встрече',
+    talk.bubbles.length >= 2 &&
+      talk.bubbles.every((text) => text.length > 5) &&
+      talk.meeting === true,
+    JSON.stringify(talk)
+  );
+
+  await send('Emulation.setEmulatedMedia', {
+    media: '',
+    features: [{ name: 'prefers-reduced-motion', value: 'reduce' }]
+  });
 
   check('15.1', 'нет необработанных JS-исключений', pageErrors.length === 0, pageErrors.slice(0, 3).join(' | '));
 

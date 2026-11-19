@@ -147,7 +147,19 @@ function renderPreview() {
 function handleChange(event) {
   const input = event.target;
   if (!input || input.name !== 'palette') return;
-  setState({ paletteId: input.value });
+
+  const palette = getPalette(input.value);
+  const state = getState();
+  /* Явный выбор в секции «Цвет» меняет и сайт, и тему предпросмотров. */
+  const patch = { paletteId: palette.id, previewPaletteId: palette.id };
+
+  /* Маскот в примере носит одежду и аксессуар выбранной новеллы, пока его
+     не настроили вручную: иначе на теме Saya остался бы бант Doki Doki. */
+  if (!state.mascotTouched) {
+    patch.mascot = { outfitId: palette.novelId, accessoryId: palette.novelId };
+  }
+
+  setState(patch);
 }
 
 export function initColor() {

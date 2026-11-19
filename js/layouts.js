@@ -5,6 +5,7 @@
 
 import { LAYOUTS, getFont, getLayout, getPalette } from './data.js';
 import { getState, setState, subscribeTo } from './state.js';
+import { applyThemeVars } from './theme.js';
 import { t, pick } from './i18n.js';
 import { escapeHtml } from './utils.js';
 
@@ -34,10 +35,14 @@ function artMarkup() {
     </div>`;
 }
 
-/** Заполняет существующий узел макетом нужного типа. */
-export function renderMockupInto(node, state, kind) {
+/**
+ * Заполняет существующий узел макетом нужного типа.
+ * paletteId задаёт локальную тему макета: в секции «Макеты» это тема
+ * предпросмотра, в итоговом брендбуке — зафиксированная тема для PDF.
+ */
+export function renderMockupInto(node, state, kind, paletteId = state.paletteId) {
   const font = getFont(state.fontId);
-  const palette = getPalette(state.paletteId);
+  const palette = getPalette(paletteId);
   const layout = getLayout(state.layoutId);
 
   const name = state.name.trim() || t('final.empty');
@@ -59,6 +64,7 @@ export function renderMockupInto(node, state, kind) {
       layout: pick(layout.label)
     })
   );
+  applyThemeVars(node, palette);
   node.style.setProperty('--mock-font', font.stack);
   node.style.setProperty('--mock-weight', String(state.fontWeight));
   node.style.setProperty('--mock-size', String(state.fontSize));
@@ -130,10 +136,11 @@ function syncComposition() {
 
 function renderMockups() {
   const state = getState();
+  const previewPaletteId = state.previewPaletteId || state.paletteId;
   const poster = document.getElementById('mockup-poster');
   const social = document.getElementById('mockup-social');
-  if (poster) renderMockupInto(poster, state, 'poster');
-  if (social) renderMockupInto(social, state, 'social');
+  if (poster) renderMockupInto(poster, state, 'poster', previewPaletteId);
+  if (social) renderMockupInto(social, state, 'social', previewPaletteId);
 }
 
 export function initLayouts() {
@@ -152,7 +159,18 @@ export function initLayouts() {
   });
 
   subscribeTo(
-    ['name', 'slogan', 'character', 'paletteId', 'fontId', 'fontSize', 'fontWeight', 'layoutId', 'lang'],
+    [
+      'name',
+      'slogan',
+      'character',
+      'paletteId',
+      'previewPaletteId',
+      'fontId',
+      'fontSize',
+      'fontWeight',
+      'layoutId',
+      'lang'
+    ],
     (state, meta) => {
       if (meta.changed.includes('lang')) {
         renderComposition();
