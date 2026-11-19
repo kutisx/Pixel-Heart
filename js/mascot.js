@@ -1,148 +1,491 @@
 /* =========================================================================
    mascot.js — пиксельный маскот, сцена, карточка и модальный редактор.
    Маскот — inline SVG из четырёх слоёв: body, outfit, head, accessory.
-   Цвета головы и тела приходят из CSS-переменных --mascot-head/--mascot-body.
+
+   Разрешение низкое, «спрайтовое»: сетка 20 × 21, viewBox — 20 × 21,
+   поэтому клетка на экране крупная. Голова — ровное пиксельное сердце,
+   лицо — только два вертикальных глаза (без рта), тело — чиби в A-позе:
+   руки разведены от плеч вниз, ноги на ширине корпуса.
+   Силуэт каждого слоя задан строками [y, x0, x1), а контур в один пиксель
+   считается автоматически: это клетки вокруг силуэта, залитые тёмным оттенком
+   цвета слоя. Цвета головы и тела независимы, одежда и аксессуары — из темы.
    ========================================================================= */
 
-import { ACCESSORIES, OUTFITS, getAccessory, getFont, getNovel, getOutfit } from './data.js';
+import {
+  ACCESSORIES,
+  NOVEL_IDS,
+  OUTFITS,
+  getAccessory,
+  getFont,
+  getNovel,
+  getOutfit,
+  getPalette
+} from './data.js';
 import { demoState, getState, setState, subscribeTo } from './state.js';
+import { mix } from './theme.js';
 import { t, pick } from './i18n.js';
 import { escapeHtml, focusSilently, focusableWithin } from './utils.js';
 
-/* ------------------------------------------------------------ слои маскота */
+/* --------------------------------------------------------------- сетка */
 
-const HEAD = `
-  <g data-part="head" class="mascot-part mascot-part--head">
-    <rect x="7" y="3" width="4" height="6" fill="var(--mascot-head)" />
-    <rect x="21" y="3" width="4" height="6" fill="var(--mascot-head)" />
-    <rect x="8" y="2" width="3" height="2" fill="var(--mascot-head)" />
-    <rect x="21" y="2" width="3" height="2" fill="var(--mascot-head)" />
-    <rect x="10" y="5" width="12" height="12" fill="var(--mascot-head)" />
-    <rect x="9" y="7" width="14" height="9" fill="var(--mascot-head)" />
-    <rect x="10" y="15" width="12" height="2" fill="#0B0B10" opacity=".14" />
-    <rect x="12" y="9" width="2" height="3" fill="#12101A" />
-    <rect x="18" y="9" width="2" height="3" fill="#12101A" />
-    <rect x="12" y="9" width="1" height="1" fill="#FFFFFF" opacity=".85" />
-    <rect x="18" y="9" width="1" height="1" fill="#FFFFFF" opacity=".85" />
-    <rect x="15" y="13" width="2" height="1" fill="#12101A" />
-    <rect x="11" y="12" width="2" height="1" fill="var(--theme-accent)" opacity=".5" />
-    <rect x="19" y="12" width="2" height="1" fill="var(--theme-accent)" opacity=".5" />
-  </g>`;
+const INK = '#0B0B10';
 
-const BODY = `
-  <g data-part="body" class="mascot-part mascot-part--body">
-    <rect x="9" y="18" width="2" height="7" fill="var(--mascot-body)" />
-    <rect x="21" y="18" width="2" height="7" fill="var(--mascot-body)" />
-    <rect x="12" y="27" width="3" height="4" fill="var(--mascot-body)" />
-    <rect x="17" y="27" width="3" height="4" fill="var(--mascot-body)" />
-    <rect x="11" y="31" width="4" height="2" fill="#12101A" />
-    <rect x="17" y="31" width="4" height="2" fill="#12101A" />
-    <rect x="11" y="17" width="10" height="10" fill="var(--mascot-body)" />
-    <rect x="13" y="20" width="6" height="1" fill="#FFFFFF" opacity=".1" />
-  </g>`;
+/** Полосы строк: y от y0 до y1 (не включая), x от x0 до x1 (не включая). */
+function rows(y0, y1, x0, x1) {
+  const out = [];
+  for (let y = y0; y < y1; y += 1) out.push([y, x0, x1]);
+  return out;
+}
+
+function cellsOf(spans) {
+  const cells = new Set();
+  spans.forEach(([y, x0, x1]) => {
+    for (let x = x0; x < x1; x += 1) cells.add(`${x}:${y}`);
+  });
+  return cells;
+}
+
+function rect(x, y, width, fill) {
+  return `<rect x="${x}" y="${y}" width="${width}" height="1" fill="${fill}" />`;
+}
+
+/** Склеивает соседние клетки строки в один <rect>. */
+function rectRows(cells, fill) {
+  const byRow = new Map();
+  cells.forEach((cell) => {
+    const [x, y] = cell.split(':').map(Number);
+    if (!byRow.has(y)) byRow.set(y, []);
+    byRow.get(y).push(x);
+  });
+  const parts = [];
+  Array.from(byRow.keys())
+    .sort((a, b) => a - b)
+    .forEach((y) => {
+      const xs = byRow.get(y).sort((a, b) => a - b);
+      let start = xs[0];
+      let prev = xs[0];
+      for (let i = 1; i < xs.length; i += 1) {
+        if (xs[i] !== prev + 1) {
+          parts.push(rect(start, y, prev - start + 1, fill));
+          start = xs[i];
+        }
+        prev = xs[i];
+      }
+      parts.push(rect(start, y, prev - start + 1, fill));
+    });
+  return parts.join('');
+}
+
+/** Контур: клетки, соседние с силуэтом, но не входящие в него. */
+function edgeOf(cells) {
+  const edge = new Set();
+  cells.forEach((cell) => {
+    const [x, y] = cell.split(':').map(Number);
+    [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].forEach(([nx, ny]) => {
+      const key = `${nx}:${ny}`;
+      if (!cells.has(key)) edge.add(key);
+    });
+  });
+  return edge;
+}
+
+/** Группа слоя: контур + заливки + детали. */
+function layer(part, groups, line, details = '') {
+  const all = new Set();
+  groups.forEach(({ spans }) => {
+    cellsOf(spans).forEach((cell) => all.add(cell));
+  });
+  const outline = line ? rectRows(edgeOf(all), line) : '';
+  const fills = groups.map(({ spans, fill }) => rectRows(cellsOf(spans), fill)).join('');
+  return `<g data-part="${part}" class="mascot-part mascot-part--${part}">${outline}${fills}${details}</g>`;
+}
+
+/* --------------------------------------------------------------- голова */
+
+/** Сердце: 12 строк (1–12), 14 клеток в ширину, выемка в две строки. */
+const HEART = [
+  [1, 5, 8], [1, 12, 15],
+  [2, 4, 9], [2, 11, 16],
+  [3, 3, 17],
+  [4, 3, 17],
+  [5, 3, 17],
+  [6, 3, 17],
+  [7, 4, 16],
+  [8, 5, 15],
+  [9, 6, 14],
+  [10, 7, 13],
+  [11, 8, 12],
+  [12, 9, 11]
+];
+
+/** Лицо: только два вертикальных глаза — без рта, бликов и румянца. */
+const FACE = `
+      <rect x="7" y="6" width="1" height="3" fill="#12101A" />
+      <rect x="12" y="6" width="1" height="3" fill="#12101A" />`;
+
+/* ---------------------------------------------------------------- тело */
+
+/** Руки в A-позе — общий силуэт для тела и рукавов одежды. */
+const ARM_SPANS = [
+  [12, 6, 7], [12, 13, 14],
+  [13, 5, 7], [13, 13, 15],
+  [14, 4, 6], [14, 14, 16],
+  [15, 4, 6], [15, 14, 16]
+];
+
+const SHORT_SLEEVE = ARM_SPANS.filter(([y]) => y < 15);
+
+/** Чиби в A-позе: короткий корпус, руки разведены от плеч, ноги на ширине. */
+const BODY_GROUPS = [
+  {
+    spans: [
+      ...rows(12, 16, 7, 13),
+      ...ARM_SPANS,
+      ...rows(16, 19, 7, 9),
+      ...rows(16, 19, 11, 13)
+    ],
+    fill: 'var(--mascot-body)'
+  },
+  {
+    spans: [...rows(19, 20, 6, 9), ...rows(19, 20, 11, 14)],
+    fill: '#12101A'
+  }
+];
+
+/* -------------------------------------------------------------- одежда */
 
 const OUTFIT_PARTS = {
-  doki: `
-    <g data-part="outfit" class="mascot-part mascot-part--outfit">
-      <rect x="10" y="16" width="12" height="9" fill="var(--theme-accent)" />
-      <rect x="10" y="16" width="12" height="2" fill="#0B0B10" opacity=".16" />
-      <rect x="14" y="16" width="4" height="2" fill="var(--mascot-head)" />
-      <rect x="9" y="22" width="2" height="3" fill="var(--theme-accent)" />
-      <rect x="21" y="22" width="2" height="3" fill="var(--theme-accent)" />
-      <rect x="14" y="20" width="1" height="1" fill="var(--theme-accent-2)" />
-      <rect x="17" y="20" width="1" height="1" fill="var(--theme-accent-2)" />
-      <rect x="14" y="21" width="4" height="1" fill="var(--theme-accent-2)" />
-      <rect x="15" y="22" width="2" height="1" fill="var(--theme-accent-2)" />
-    </g>`,
-  saya: `
-    <g data-part="outfit" class="mascot-part mascot-part--outfit">
-      <rect x="9" y="16" width="14" height="15" fill="var(--theme-accent)" opacity=".94" />
-      <rect x="9" y="16" width="3" height="15" fill="#0B0B10" opacity=".28" />
-      <rect x="20" y="16" width="3" height="15" fill="#0B0B10" opacity=".28" />
-      <rect x="15" y="18" width="2" height="13" fill="#0B0B10" opacity=".32" />
-      <rect x="10" y="16" width="12" height="2" fill="var(--mascot-body)" />
-      <rect x="12" y="19" width="2" height="2" fill="var(--theme-accent-2)" />
-      <rect x="18" y="19" width="2" height="2" fill="var(--theme-accent-2)" />
-    </g>`,
-  nine: `
-    <g data-part="outfit" class="mascot-part mascot-part--outfit">
-      <rect x="10" y="16" width="12" height="10" fill="var(--theme-accent)" opacity=".92" />
-      <rect x="14" y="16" width="4" height="2" fill="var(--mascot-body)" />
-      <rect x="15" y="18" width="2" height="5" fill="var(--theme-accent-2)" />
-      <rect x="11" y="18" width="2" height="1" fill="#FFFFFF" opacity=".28" />
-      <rect x="19" y="18" width="2" height="1" fill="#FFFFFF" opacity=".28" />
-      <rect x="10" y="24" width="12" height="1" fill="#0B0B10" opacity=".32" />
-      <rect x="10" y="26" width="12" height="1" fill="#0B0B10" opacity=".22" />
-    </g>`,
-  va11: `
-    <g data-part="outfit" class="mascot-part mascot-part--outfit">
-      <rect x="11" y="17" width="10" height="2" fill="var(--theme-accent-2)" />
-      <rect x="12" y="19" width="8" height="10" fill="var(--theme-accent)" opacity=".92" />
-      <rect x="12" y="24" width="8" height="1" fill="#0B0B10" opacity=".35" />
-      <rect x="12" y="25" width="3" height="2" fill="var(--theme-accent-2)" opacity=".8" />
-      <rect x="17" y="25" width="3" height="2" fill="#0B0B10" opacity=".3" />
-    </g>`
+  /* Свитер: ворот, сердце на груди, манжеты и резинка с рёбрами. */
+  doki: {
+    base: [
+      {
+        spans: [...rows(12, 16, 6, 14), ...SHORT_SLEEVE],
+        fill: 'var(--theme-accent)'
+      }
+    ],
+    details: `
+      <rect x="8" y="12" width="4" height="1" fill="var(--theme-accent-2)" />
+      <rect x="6" y="12" width="1" height="1" fill="#0B0B10" opacity=".22" />
+      <rect x="13" y="12" width="1" height="1" fill="#0B0B10" opacity=".22" />
+      <rect x="5" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="13" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="9" y="13" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="11" y="13" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="9" y="14" width="3" height="1" fill="var(--theme-accent-2)" />
+      <rect x="6" y="15" width="8" height="1" fill="#0B0B10" opacity=".24" />
+      <rect x="7" y="15" width="1" height="1" fill="var(--theme-accent)" />
+      <rect x="10" y="15" width="1" height="1" fill="var(--theme-accent)" />
+      <rect x="12" y="15" width="1" height="1" fill="var(--theme-accent)" />
+    `
+  },
+  /* Плащ: лацканы, двубортные пуговицы, пояс с пряжкой, карманы и подол. */
+  saya: {
+    base: [
+      {
+        spans: [
+          ...rows(11, 13, 5, 9),
+          ...rows(11, 13, 11, 15),
+          [12, 5, 15],
+          ...rows(13, 20, 4, 16)
+        ],
+        fill: 'var(--theme-accent)'
+      }
+    ],
+    details: `
+      <rect x="5" y="11" width="4" height="1" fill="#0B0B10" opacity=".28" />
+      <rect x="11" y="11" width="4" height="1" fill="#0B0B10" opacity=".28" />
+      <rect x="6" y="12" width="2" height="1" fill="#0B0B10" opacity=".26" />
+      <rect x="12" y="12" width="2" height="1" fill="#0B0B10" opacity=".26" />
+      <rect x="9" y="12" width="2" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="4" y="13" width="2" height="7" fill="#0B0B10" opacity=".2" />
+      <rect x="14" y="13" width="2" height="7" fill="#0B0B10" opacity=".2" />
+      <rect x="9" y="13" width="2" height="7" fill="#0B0B10" opacity=".26" />
+      <rect x="8" y="13" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="11" y="14" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="8" y="16" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="11" y="17" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="4" y="15" width="12" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="9" y="15" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="5" y="17" width="3" height="1" fill="#0B0B10" opacity=".24" />
+      <rect x="12" y="17" width="3" height="1" fill="#0B0B10" opacity=".24" />
+      <rect x="4" y="19" width="12" height="1" fill="#0B0B10" opacity=".3" />
+    `
+  },
+  /* Форма: матросский воротник, галстук, манжеты и юбка в складку. */
+  nine: {
+    base: [
+      {
+        spans: [...rows(12, 16, 6, 14), ...SHORT_SLEEVE, ...rows(16, 19, 5, 15), ...rows(19, 20, 4, 16)],
+        fill: 'var(--theme-accent)'
+      }
+    ],
+    details: `
+      <rect x="6" y="12" width="3" height="1" fill="#FFFFFF" opacity=".85" />
+      <rect x="11" y="12" width="3" height="1" fill="#FFFFFF" opacity=".85" />
+      <rect x="6" y="13" width="3" height="1" fill="#FFFFFF" opacity=".5" />
+      <rect x="11" y="13" width="3" height="1" fill="#FFFFFF" opacity=".5" />
+      <rect x="9" y="12" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="9" y="13" width="2" height="3" fill="var(--theme-accent-2)" />
+      <rect x="9" y="15" width="2" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="5" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="13" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="5" y="15" width="10" height="1" fill="#0B0B10" opacity=".32" />
+      <rect x="7" y="16" width="1" height="3" fill="#0B0B10" opacity=".22" />
+      <rect x="10" y="16" width="1" height="3" fill="#0B0B10" opacity=".22" />
+      <rect x="13" y="16" width="1" height="3" fill="#0B0B10" opacity=".22" />
+      <rect x="4" y="19" width="12" height="1" fill="#0B0B10" opacity=".28" />
+    `
+  },
+  /* Фартук: бретели с пряжками, ворот рубашки, карман с перегородкой, бейдж. */
+  va11: {
+    base: [
+      { spans: rows(12, 14, 6, 14), fill: 'var(--theme-accent-2)' },
+      { spans: rows(14, 20, 7, 13), fill: 'var(--theme-accent)' }
+    ],
+    details: `
+      <rect x="9" y="12" width="2" height="1" fill="#FFFFFF" opacity=".5" />
+      <rect x="8" y="12" width="1" height="2" fill="var(--theme-accent)" />
+      <rect x="11" y="12" width="1" height="2" fill="var(--theme-accent)" />
+      <rect x="8" y="13" width="1" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="11" y="13" width="1" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="7" y="14" width="6" height="1" fill="#0B0B10" opacity=".22" />
+      <rect x="7" y="15" width="1" height="4" fill="#0B0B10" opacity=".16" />
+      <rect x="12" y="15" width="1" height="4" fill="#0B0B10" opacity=".16" />
+      <rect x="7" y="16" width="6" height="1" fill="#0B0B10" opacity=".26" />
+      <rect x="10" y="17" width="1" height="2" fill="#0B0B10" opacity=".3" />
+      <rect x="10" y="15" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="7" y="19" width="6" height="1" fill="#0B0B10" opacity=".24" />
+    `
+  },
+  /* Худи: капюшон с подкладом, шнурки с наконечниками, карман-кенгуру, резинки. */
+  hoodie: {
+    base: [
+      {
+        spans: [
+          ...rows(11, 13, 6, 10),
+          ...rows(11, 13, 10, 14),
+          ...rows(12, 16, 6, 14),
+          ...SHORT_SLEEVE
+        ],
+        fill: 'var(--theme-accent)'
+      }
+    ],
+    details: `
+      <rect x="6" y="11" width="4" height="1" fill="#0B0B10" opacity=".28" />
+      <rect x="10" y="11" width="4" height="1" fill="#0B0B10" opacity=".28" />
+      <rect x="8" y="11" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="8" y="12" width="1" height="2" fill="var(--theme-accent-2)" />
+      <rect x="11" y="12" width="1" height="2" fill="var(--theme-accent-2)" />
+      <rect x="8" y="14" width="1" height="1" fill="#0B0B10" opacity=".45" />
+      <rect x="11" y="14" width="1" height="1" fill="#0B0B10" opacity=".45" />
+      <rect x="7" y="14" width="6" height="1" fill="#0B0B10" opacity=".14" />
+      <rect x="7" y="14" width="2" height="1" fill="#0B0B10" opacity=".26" />
+      <rect x="11" y="14" width="2" height="1" fill="#0B0B10" opacity=".26" />
+      <rect x="5" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="13" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="6" y="15" width="8" height="1" fill="#0B0B10" opacity=".24" />
+    `
+  },
+  /* Платье: ворот, швы лифа, бант на поясе, складки и рюш по подолу. */
+  dress: {
+    base: [
+      {
+        spans: [...rows(12, 16, 7, 13), ...SHORT_SLEEVE, ...rows(16, 19, 5, 15), ...rows(19, 20, 4, 16)],
+        fill: 'var(--theme-accent)'
+      }
+    ],
+    details: `
+      <rect x="8" y="12" width="4" height="1" fill="#FFFFFF" opacity=".5" />
+      <rect x="8" y="13" width="1" height="2" fill="#0B0B10" opacity=".18" />
+      <rect x="11" y="13" width="1" height="2" fill="#0B0B10" opacity=".18" />
+      <rect x="5" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="13" y="13" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="9" y="14" width="2" height="1" fill="var(--theme-accent-2)" />
+      <rect x="7" y="15" width="6" height="1" fill="var(--theme-accent-2)" />
+      <rect x="7" y="16" width="1" height="3" fill="#0B0B10" opacity=".16" />
+      <rect x="10" y="16" width="1" height="3" fill="#0B0B10" opacity=".16" />
+      <rect x="12" y="16" width="1" height="3" fill="#0B0B10" opacity=".16" />
+      <rect x="4" y="19" width="12" height="1" fill="var(--theme-accent-2)" opacity=".85" />
+    `
+  }
 };
 
+/* ----------------------------------------------------------- аксессуары */
+
 const ACCESSORY_PARTS = {
-  none: '',
-  doki: `
-    <g data-part="accessory" class="mascot-part mascot-part--accessory">
-      <rect x="12" y="0" width="3" height="3" fill="var(--theme-accent-2)" />
-      <rect x="17" y="0" width="3" height="3" fill="var(--theme-accent-2)" />
-      <rect x="15" y="1" width="2" height="2" fill="var(--theme-accent)" />
-      <rect x="12" y="0" width="1" height="1" fill="#FFFFFF" opacity=".6" />
-    </g>`,
-  saya: `
-    <g data-part="accessory" class="mascot-part mascot-part--accessory">
-      <rect x="9" y="8" width="14" height="5" fill="#0B0B10" opacity=".5" />
-      <rect x="9" y="8" width="14" height="1" fill="var(--theme-accent-2)" />
-      <rect x="12" y="9" width="3" height="3" fill="var(--theme-accent-2)" opacity=".9" />
-      <rect x="17" y="9" width="3" height="3" fill="var(--theme-accent-2)" opacity=".9" />
-      <rect x="9" y="8" width="1" height="5" fill="var(--theme-accent-2)" />
-      <rect x="22" y="8" width="1" height="5" fill="var(--theme-accent-2)" />
-    </g>`,
-  nine: `
-    <g data-part="accessory" class="mascot-part mascot-part--accessory">
-      <rect x="20" y="4" width="2" height="2" fill="var(--theme-accent-2)" />
-      <rect x="19" y="5" width="4" height="1" fill="var(--theme-accent-2)" />
-      <rect x="20" y="6" width="2" height="1" fill="var(--theme-accent-2)" />
-      <rect x="21" y="3" width="1" height="1" fill="#FFFFFF" opacity=".85" />
-    </g>`,
-  va11: `
-    <g data-part="accessory" class="mascot-part mascot-part--accessory">
-      <rect x="7" y="4" width="18" height="1" fill="var(--theme-accent-2)" />
-      <rect x="7" y="5" width="1" height="6" fill="var(--theme-accent-2)" />
-      <rect x="24" y="5" width="1" height="6" fill="var(--theme-accent-2)" />
-      <rect x="5" y="9" width="3" height="4" fill="var(--theme-accent-2)" />
-      <rect x="24" y="9" width="3" height="4" fill="var(--theme-accent-2)" />
-      <rect x="24" y="12" width="4" height="1" fill="var(--theme-accent-2)" />
-      <rect x="27" y="12" width="1" height="4" fill="var(--theme-accent-2)" />
-      <rect x="27" y="15" width="2" height="1" fill="var(--theme-accent-2)" />
-    </g>`
+  none: { line: false, base: [], details: '' },
+  /* Лента: крылья с тенью, узел со складкой и два хвостика. */
+  doki: {
+    line: false,
+    base: [
+      {
+        spans: [
+          [1, 7, 9], [1, 11, 13],
+          [2, 6, 9], [2, 11, 14],
+          [3, 7, 9], [3, 11, 13]
+        ],
+        fill: 'var(--theme-accent-2)'
+      },
+      { spans: rows(1, 4, 9, 11), fill: 'var(--theme-accent)' }
+    ],
+    details: `
+      <rect x="6" y="2" width="1" height="1" fill="#0B0B10" opacity=".2" />
+      <rect x="13" y="2" width="1" height="1" fill="#0B0B10" opacity=".2" />
+      <rect x="9" y="2" width="2" height="1" fill="var(--theme-accent-2)" opacity=".8" />
+      <rect x="7" y="1" width="1" height="1" fill="#FFFFFF" opacity=".45" />
+      <rect x="9" y="4" width="1" height="1" fill="var(--theme-accent-2)" />
+      <rect x="10" y="4" width="1" height="1" fill="var(--theme-accent-2)" />
+    `
+  },
+  /* Визор: ремешок, линзы с бликами и верхняя кромка. */
+  saya: {
+    line: false,
+    base: [{ spans: rows(6, 9, 6, 14), fill: 'var(--theme-accent-2)' }],
+    details: `
+      <rect x="7" y="6" width="1" height="2" fill="#0B0B10" opacity=".5" />
+      <rect x="12" y="6" width="1" height="2" fill="#0B0B10" opacity=".5" />
+      <rect x="7" y="6" width="1" height="1" fill="#FFFFFF" opacity=".55" />
+      <rect x="12" y="6" width="1" height="1" fill="#FFFFFF" opacity=".3" />
+      <rect x="6" y="6" width="4" height="1" fill="#FFFFFF" opacity=".14" />
+      <rect x="10" y="7" width="2" height="1" fill="#0B0B10" opacity=".3" />
+    `
+  },
+  /* Заколка: звезда с бликом и штифтом. */
+  nine: {
+    line: false,
+    base: [
+      {
+        spans: [
+          [2, 15, 16],
+          [3, 13, 15],
+          [4, 12, 16],
+          [5, 13, 15],
+          [6, 15, 16]
+        ],
+        fill: 'var(--theme-accent-2)'
+      }
+    ],
+    details: `
+      <rect x="12" y="4" width="1" height="1" fill="#FFFFFF" opacity=".7" />
+      <rect x="13" y="6" width="1" height="1" fill="#0B0B10" opacity=".35" />
+    `
+  },
+  /* Наушники: дуга с подушечкой, дужки, чашки с амбушюрами и микрофон. */
+  va11: {
+    line: false,
+    base: [
+      {
+        spans: [
+          ...rows(1, 2, 6, 14),
+          ...rows(2, 5, 4, 5),
+          ...rows(2, 5, 15, 16),
+          ...rows(5, 8, 3, 6),
+          ...rows(5, 8, 14, 17)
+        ],
+        fill: 'var(--theme-accent-2)'
+      }
+    ],
+    details: `
+      <rect x="7" y="1" width="6" height="1" fill="#FFFFFF" opacity=".14" />
+      <rect x="4" y="6" width="1" height="1" fill="#0B0B10" opacity=".35" />
+      <rect x="15" y="6" width="1" height="1" fill="#0B0B10" opacity=".35" />
+      <rect x="5" y="7" width="1" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="14" y="7" width="1" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="4" y="5" width="1" height="1" fill="#FFFFFF" opacity=".2" />
+      <rect x="13" y="7" width="1" height="1" fill="var(--theme-accent)" />
+      <rect x="13" y="8" width="1" height="1" fill="var(--theme-accent)" opacity=".8" />
+    `
+  },
+  /* Корона: обод, зубцы, камни и блики. */
+  crown: {
+    line: false,
+    base: [
+      {
+        spans: [...rows(3, 5, 7, 13), [1, 7, 8], [1, 9, 11], [1, 12, 13]],
+        fill: 'var(--theme-accent-2)'
+      }
+    ],
+    details: `
+      <rect x="7" y="3" width="6" height="1" fill="#0B0B10" opacity=".18" />
+      <rect x="8" y="4" width="1" height="1" fill="var(--theme-accent)" />
+      <rect x="10" y="4" width="2" height="1" fill="var(--theme-accent)" />
+      <rect x="12" y="4" width="1" height="1" fill="var(--theme-accent)" />
+      <rect x="7" y="1" width="1" height="1" fill="#FFFFFF" opacity=".5" />
+      <rect x="12" y="2" width="1" height="1" fill="#FFFFFF" opacity=".3" />
+    `
+  },
+  /* Очки: рамки, мост, дужки и блики на стёклах. */
+  glasses: {
+    line: false,
+    base: [
+      {
+        spans: [
+          ...rows(5, 6, 6, 9),
+          ...rows(5, 6, 11, 14),
+          ...rows(9, 10, 6, 9),
+          ...rows(9, 10, 11, 14),
+          ...rows(6, 9, 6, 7),
+          ...rows(6, 9, 8, 9),
+          ...rows(6, 9, 11, 12),
+          ...rows(6, 9, 13, 14),
+          ...rows(5, 6, 9, 11),
+          ...rows(6, 8, 5, 6),
+          ...rows(6, 8, 14, 15)
+        ],
+        fill: 'var(--theme-accent-2)'
+      }
+    ],
+    details: `
+      <rect x="6" y="5" width="1" height="1" fill="#FFFFFF" opacity=".45" />
+      <rect x="11" y="5" width="1" height="1" fill="#FFFFFF" opacity=".3" />
+      <rect x="5" y="8" width="1" height="1" fill="#0B0B10" opacity=".3" />
+      <rect x="14" y="8" width="1" height="1" fill="#0B0B10" opacity=".3" />
+    `
+  }
 };
+
+/* --------------------------------------------------------------- сборка */
 
 /** Собирает inline SVG маскота. Все части — отдельные группы с data-part. */
 export function buildMascotSVG(state, { decorative = false } = {}) {
   const outfit = getOutfit(state.mascot.outfitId);
   const accessory = getAccessory(state.mascot.accessoryId);
-  const label = `${t('mascot.caption')}: ${pick(outfit.label)}, ${pick(accessory.label)}`;
+  const palette = getPalette(state.paletteId || 'doki');
 
   const headColor = state.mascot.headColor;
   const bodyColor = state.mascot.bodyColor;
   const style = `--mascot-head:${headColor};--mascot-body:${bodyColor}`;
 
+  /* Обводка — тёмный оттенок цвета слоя: живёт вместе с палитрой и ползунками. */
+  const lines = {
+    head: mix(headColor, INK, 0.94),
+    body: mix(bodyColor, INK, 0.94),
+    outfit: mix(palette.accent, INK, 0.94),
+    accessory: mix(palette.accent2, INK, 0.94)
+  };
+
+  const label = `${t('mascot.caption')}: ${pick(outfit.label)}, ${pick(accessory.label)}`;
   const a11y = decorative
     ? 'aria-hidden="true" focusable="false"'
     : `role="img" aria-label="${escapeHtml(label)}"`;
 
-  return `<svg class="mascot-svg" viewBox="0 0 32 34" ${a11y} style="${style}">
+  const outfitPart = OUTFIT_PARTS[state.mascot.outfitId] || OUTFIT_PARTS.doki;
+  const accessoryPart = ACCESSORY_PARTS[state.mascot.accessoryId] || ACCESSORY_PARTS.none;
+
+  const bodySvg = layer('body', BODY_GROUPS, lines.body);
+  const outfitSvg = layer('outfit', outfitPart.base, lines.outfit, outfitPart.details);
+  const headSvg = layer('head', [{ spans: HEART, fill: 'var(--mascot-head)' }], lines.head, FACE);
+  const accessorySvg = accessoryPart.base.length
+    ? layer('accessory', accessoryPart.base, accessoryPart.line ? lines.accessory : null, accessoryPart.details)
+    : '';
+
+  return `<svg class="mascot-svg" viewBox="0 0 20 21" ${a11y} style="${style}">
     ${decorative ? '' : `<title>${escapeHtml(label)}</title>`}
     <g class="mascot">
-      ${BODY}
-      ${OUTFIT_PARTS[state.mascot.outfitId] || OUTFIT_PARTS.doki}
-      ${HEAD}
-      ${ACCESSORY_PARTS[state.mascot.accessoryId] || ''}
+      ${bodySvg}
+      ${outfitSvg}
+      ${headSvg}
+      ${accessorySvg}
     </g>
   </svg>`;
 }
@@ -177,6 +520,13 @@ function renderCard() {
   const font = getFont(state.fontId);
   const novel = getNovel(state.activeNovelId);
   const quote = state.quoteText.trim();
+  const outfit = getOutfit(state.mascot.outfitId);
+  const accessory = getAccessory(state.mascot.accessoryId);
+
+  /* Одежда и аксессуары бывают «новелльные» и свободные: подпись под сценой
+     честно говорит, что перед нами — вариант истории или собранный образ. */
+  const novelVariant =
+    NOVEL_IDS.includes(state.mascot.outfitId) && NOVEL_IDS.includes(state.mascot.accessoryId);
 
   card.style.setProperty('--quote-font', font.stack);
   card.style.setProperty('--quote-weight', String(state.fontWeight));
@@ -185,7 +535,11 @@ function renderCard() {
   quoteElement.textContent = quote || t('mascot.noQuote');
   quoteElement.dataset.empty = quote ? 'false' : 'true';
 
-  if (sceneNovel) sceneNovel.textContent = t('mascot.sceneNote', { novel: novel.name });
+  if (sceneNovel) {
+    sceneNovel.textContent = novelVariant
+      ? t('mascot.sceneNote', { novel: novel.name })
+      : t('mascot.sceneFree', { outfit: pick(outfit.label), accessory: pick(accessory.label) });
+  }
   if (cardNovel) cardNovel.textContent = novel.name;
 }
 
